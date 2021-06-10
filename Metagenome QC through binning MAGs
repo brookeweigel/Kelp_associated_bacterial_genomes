@@ -1,5 +1,6 @@
 ## BEGIN ANALYSIS: QUALITY CONTROL & FILTERING ##
 
+## Metagenome sample key:
 B1 = squaxin 
 B2 = 2019a 
 B3 = 2019b 
@@ -13,19 +14,25 @@ B7 = 2018b
 module load Anaconda3/2019.03
 conda activate anvio-6.1
 
-## First sample (B1 = squaxin)
+## Step 1: Quality Control
+## Within anvio, use iu-gen-configs program with samples.txt to create config files for illumina-utils
+## This tells the program where the input files are, as well as where the output should go
+## Make output directory (01_QC)
 
-## From anvio: use iu-gen-configs program with samples.txt to crate config files for illumina-utils in it. This tells the program where the input files are, as well as where the output should go.
+iu-gen-configs 2019a.txt -o 01_QC
 
-iu-gen-configs squaxin.txt -o 01_QC
+## Where the tile 2019a.txt contains your metagenome raw sample files, like this:
+sample	r1	                     r2
+B4	    B4_S4_L002_R1_001.fastq	 B4_S4_L002_R2_001.fastq
 
-## Created the file “B1.ini” (~ 5 mins run time). Now you are ready to run quality filtering for each of your samples. You can do it for one of them the following way:
+## The above code created the file “B2.ini” (~ 5 mins run time).
+## Repeat iu-gen-configs for each of your metagenome samples!
+## Now you are ready to run quality filtering for each of your samples with the following code:
 
 iu-filter-quality-minoche 01_QC/B1.ini 
 
-### Results for B1:
+### Example results for metagenome sample B1: cat B1-STATS.txt
 
-[brookeweigel@midway2-0039 01_QC]$ cat B1-STATS.txt
 number of pairs analyzed      : 21,877,993
 total pairs passed            : 20,141,653 (%92.06 of all pairs)
   total pair_1 trimmed        : 0 (%0.00 of all passed pairs)
@@ -35,121 +42,105 @@ total pairs failed            : 1736340 (%7.94 of all pairs)
   pairs failed due to pair_2  : 928052 (%53.45 of all failed pairs)
   pairs failed due to both    : 501291 (%28.87 of all failed pairs)
 
-## Next sample (B2 = 2019a)
-
-iu-gen-configs 2019a.txt -o 01_QC
-
-iu-filter-quality-minoche 01_QC/B2.ini 
-
-
-### Results for B2:
-
-[brookeweigel@midway2-0132 01_QC]$ cat B2-STATS.txt
-number of pairs analyzed      : 43,454,508
-total pairs passed            : 41,368,444 (%95.20 of all pairs)
-  total pair_1 trimmed        : 0 (%0.00 of all passed pairs)
-  total pair_2 trimmed        : 0 (%0.00 of all passed pairs)
-total pairs failed            : 2086064 (%4.80 of all pairs)
-  pairs failed due to pair_1  : 836809 (%40.11 of all failed pairs)
-  pairs failed due to pair_2  : 660561 (%31.67 of all failed pairs)
-  pairs failed due to both    : 588694 (%28.22 of all failed pairs)
-
-
-## Next sample (B3 = 2019b)
-
-iu-gen-configs 2019b.txt -o 01_QC
-
-iu-filter-quality-minoche 01_QC/B3.ini 
-
-
-### Results for B3:
-
-(anvio-6.1) [brookeweigel@midway2-0079 01_QC]$ cat B3-STATS.txt 
-number of pairs analyzed      : 42,702,665
-total pairs passed            : 40,561,192 (%94.99 of all pairs)
-  total pair_1 trimmed        : 0 (%0.00 of all passed pairs)
-  total pair_2 trimmed        : 0 (%0.00 of all passed pairs)
-total pairs failed            : 2141473 (%5.01 of all pairs)
-  pairs failed due to pair_1  : 747012 (%34.88 of all failed pairs)
-  pairs failed due to pair_2  : 756055 (%35.31 of all failed pairs)
-  pairs failed due to both    : 638406 (%29.81 of all failed pairs)
-
-
-## Next sample (B4 = 2017a)
-
-iu-gen-configs 2017a.txt -o 01_QC
-
-iu-filter-quality-minoche 01_QC/B4.ini 
-
-### Results for B4:
-
-[brookeweigel@midway2-login1 01_QC]$ cat B4-STATS.txt 
-number of pairs analyzed      : 20,155,897
-total pairs passed            : 18,813,498 (%93.34 of all pairs)
-  total pair_1 trimmed        : 0 (%0.00 of all passed pairs)
-  total pair_2 trimmed        : 0 (%0.00 of all passed pairs)
-total pairs failed            : 1342399 (%6.66 of all pairs)
-  pairs failed due to pair_1  : 350018 (%26.07 of all failed pairs)
-  pairs failed due to pair_2  : 614844 (%45.80 of all failed pairs)
-  pairs failed due to both    : 377537 (%28.12 of all failed pairs)
-
-
-## Next sample (B5 = 2017b)
-
-iu-gen-configs 2017b.txt -o 01_QC
-
-iu-filter-quality-minoche 01_QC/B5.ini 
-
-
-### Results for B5:
-
-(anvio-6.1) [brookeweigel@midway2-0040 01_QC]$ cat B5-STATS.txt 
-number of pairs analyzed      : 23,082,750
-total pairs passed            : 21,529,906 (%93.27 of all pairs)
-  total pair_1 trimmed        : 0 (%0.00 of all passed pairs)
-  total pair_2 trimmed        : 0 (%0.00 of all passed pairs)
-total pairs failed            : 1552844 (%6.73 of all pairs)
-  pairs failed due to pair_1  : 400373 (%25.78 of all failed pairs)
-  pairs failed due to pair_2  : 722713 (%46.54 of all failed pairs)
-  pairs failed due to both    : 429758 (%27.68 of all failed pairs)
-
-
-## Next sample (B6 = 2018a)
-
-iu-gen-configs 2018a.txt -o 01_QC
-
-iu-filter-quality-minoche 01_QC/B6.ini 
-
-### Results for B6: I’m pretty sure that pairs = sequence reads 
-
-(anvio-6.1) [brookeweigel@midway2-0173 01_QC]$ cat B6-STATS.txt 
-number of pairs analyzed      : 11,191,363
-total pairs passed            : 10,353,284 (%92.51 of all pairs)
-  total pair_1 trimmed        : 0 (%0.00 of all passed pairs)
-  total pair_2 trimmed        : 0 (%0.00 of all passed pairs)
-total pairs failed            : 838079 (%7.49 of all pairs)
-  pairs failed due to pair_1  : 200687 (%23.95 of all failed pairs)
-  pairs failed due to pair_2  : 395188 (%47.15 of all failed pairs)
-  pairs failed due to both    : 242204 (%28.90 of all failed pairs)
-
-
-## Last sample (B7 = 2018b)
-
-iu-gen-configs 2018b.txt -o 01_QC
-
-iu-filter-quality-minoche 01_QC/B7.ini 
-
-### Results for B7:
-
-(anvio-6.1) [brookeweigel@midway2-0158 01_QC]$ cat B7-STATS.txt 
-number of pairs analyzed      : 3,868,903
-total pairs passed            : 3,609,035 (%93.28 of all pairs)
-  total pair_1 trimmed        : 0 (%0.00 of all passed pairs)
-  total pair_2 trimmed        : 0 (%0.00 of all passed pairs)
-total pairs failed            : 259868 (%6.72 of all pairs)
-  pairs failed due to pair_1  : 73436 (%28.26 of all failed pairs)
-  pairs failed due to pair_2  : 115395 (%44.41 of all failed pairs)
-  pairs failed due to both    : 71037 (%27.34 of all failed pairs)
-
-
 ##############################################################
+
+## Step 2: Assemble short reads into contigs with IDBA-UD (Peng et al. 2012)
+
+## ADD ASSEMBLY DETAILS FROM EMILY
+anvio snakemake pipeline (see Emily_MAG_assembly_snakemake_pipeline.txt)
+
+Final co-assembly
+g1 = B1 (Squaxin)
+g2 = B2 (2019a) + B3 (2019b)
+g3 = B4 (2017a) + B5 (2017b)
+g4 = B6 (2018a) + B7 (2018b)
+
+## How to display the stats for the contigs:
+cd 03_CONTIGS
+
+anvi-display-contigs-stats g1-contigs.db
+
+contigs.fasta are the assembled contigs
+BAM files = files with short reads mapped to contigs
+
+## Create a new anvio profile for each sample assembly:
+
+Creates a single anvi'o profile database. The default input to this program is
+a BAM file. When it is run on a BAM file, depending on the user parameters,
+the program quantifies coverage per nucleotide position (and averages them out
+per contig), calculates single-nucleotide, single-codon, and single-amino acid
+variants, and stores these data into appropriate tables. 
+
+## Start anvio
+
+module load Anaconda3/2019.03
+conda activate anvio-6.1
+
+## Example code for creating an anvio profile database for a single metagenome sample
+anvi-profile -i 04_MAPPING/g1/B1.bam -c 03_CONTIGS/g1-contigs.db --min-contig-length 2500 -o 05_NEW_ANVIO_PROFILES/Squaxin --sample-name Squaxin
+
+## Note: I didn’t use “anti-cluster-contigs” for the single samples (will do this for the merged database), so anvi-interactive can’t display anything right now
+## Note: This step takes a lot of time - from 2 to 15 hours per profile, run on a server with a batch script
+
+## If you have any co-assembled samples, merge your profile databases:
+## Merge databases: 2019 = B2 (2019a) + B3 (2019b)
+anvi-merge 05_NEW_ANVIO_PROFILES/B2/PROFILE.db 05_NEW_ANVIO_PROFILES/B3/PROFILE.db --enforce-hierarchical-clustering -c 03_CONTIGS/g2-contigs.db -o 06_NEW_MERGED/2019 -S y2019
+
+## This step was fast, from 2-15 minutes
+
+## Next step: Importing taxonomy calls for genes using scg-taxonomy
+
+## Example:
+anvi-run-scg-taxonomy -c 03_CONTIGS/g1-contigs.db --num-parallel-processes 3 --num-threads 2
+
+## Estimate the genomes and taxonomy of bacteria in your metagenome sample (not final taxonomy & you haven't assembled any genomes yet, just a rough estimate)
+anvi-estimate-genome-taxonomy -c 03_CONTIGS/g1-contigs.db -p 05_NEW_ANVIO_PROFILES/B1/PROFILE.db --metagenome-mode --compute-scg-coverages --update-profile-db-with-taxonomy
+
+##################################################
+
+## Next step: Map short reads from all metagenome samples to all contig assemblies
+
+## load your modules here
+module load Anaconda3/2019.03
+conda activate anvio-6.1
+
+## Example: mapping samples to g1 assembly in Bowtie2
+
+## Mapping sample B1 to assembly g1... repeat for all samples (B1-B7)
+## STEP_1
+bowtie2 --threads 4 -x 04_MAPPING/g1/g1-contigs -1 01_QC/B1-QUALITY_PASSED_R1.fastq -2 01_QC/B1-QUALITY_PASSED_R2.fastq -S 04_MAPPING/g1/B1.sam
+## STEP_2
+samtools view -F 4 -bS 04_MAPPING/g1/B1.sam > 04_MAPPING/g1/B1-RAW.bam
+## STEP_3
+anvi-init-bam 04_MAPPING/g1/B1-RAW.bam -o 04_MAPPING/g1/B1.bam
+## STEP_4
+rm 04_MAPPING/g1/B1.sam 04_MAPPING/g1/B1-RAW.bam
+
+... repeat above steps for all of your samples, mapping them to each contig assembly using Bowtie2 in anvio
+
+##############################################
+## Next step: Binning contigs into MAGS (metagenome-assembled-genomes) using anvi-interactive
+
+## Tips for using anvi-interactive while working on a remote server:
+
+## First, look up your computer’s IP address (it will print the # in your terminal):
+/sbin/ip route get 8.8.8.8 | awk '{print $NF;exit}'
+## it will print something like this: 128.135.112.69
+
+## Now, use anvi-interactive, but you need to include your computer’s IP address with the -I option. For example:
+anvi-interactive -p 06_NEW_MERGED/2018/PROFILE.db -c 03_CONTIGS/g4-contigs.db -I 128.135.112.69
+
+## Then go to a browser and type: http://your_IP_address:8080/
+
+Example: http://10.50.221.6:8080/
+
+####################################
+
+anvi-interactive -p 05_NEW_ANVIO_PROFILES/B1/PROFILE.db -c 03_CONTIGS/g1-contigs.db -I 128.135.112.69
+
+
+
+### SUPER HELPFUL: In the anvio interface, under “bins,” click “Generate a static summary page” ###
+### this stores an html summary page containing info about all bins, as well as the profile db, and
+### even functional information for each bin! For example, click on the bin then scroll to “Gene calls”
+### and you can click on the “genes” link for each bin to search for functional genes!!
