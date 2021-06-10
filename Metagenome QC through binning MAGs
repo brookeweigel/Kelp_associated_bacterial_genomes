@@ -1,0 +1,155 @@
+## BEGIN ANALYSIS: QUALITY CONTROL & FILTERING ##
+
+B1 = squaxin 
+B2 = 2019a 
+B3 = 2019b 
+B4 = 2017a 
+B5 = 2017b 
+B6 = 2018a
+B7 = 2018b 
+
+## Start anvio
+
+module load Anaconda3/2019.03
+conda activate anvio-6.1
+
+## First sample (B1 = squaxin)
+
+## From anvio: use iu-gen-configs program with samples.txt to crate config files for illumina-utils in it. This tells the program where the input files are, as well as where the output should go.
+
+iu-gen-configs squaxin.txt -o 01_QC
+
+## Created the file “B1.ini” (~ 5 mins run time). Now you are ready to run quality filtering for each of your samples. You can do it for one of them the following way:
+
+iu-filter-quality-minoche 01_QC/B1.ini 
+
+### Results for B1:
+
+[brookeweigel@midway2-0039 01_QC]$ cat B1-STATS.txt
+number of pairs analyzed      : 21,877,993
+total pairs passed            : 20,141,653 (%92.06 of all pairs)
+  total pair_1 trimmed        : 0 (%0.00 of all passed pairs)
+  total pair_2 trimmed        : 0 (%0.00 of all passed pairs)
+total pairs failed            : 1736340 (%7.94 of all pairs)
+  pairs failed due to pair_1  : 306997 (%17.68 of all failed pairs)
+  pairs failed due to pair_2  : 928052 (%53.45 of all failed pairs)
+  pairs failed due to both    : 501291 (%28.87 of all failed pairs)
+
+## Next sample (B2 = 2019a)
+
+iu-gen-configs 2019a.txt -o 01_QC
+
+iu-filter-quality-minoche 01_QC/B2.ini 
+
+
+### Results for B2:
+
+[brookeweigel@midway2-0132 01_QC]$ cat B2-STATS.txt
+number of pairs analyzed      : 43,454,508
+total pairs passed            : 41,368,444 (%95.20 of all pairs)
+  total pair_1 trimmed        : 0 (%0.00 of all passed pairs)
+  total pair_2 trimmed        : 0 (%0.00 of all passed pairs)
+total pairs failed            : 2086064 (%4.80 of all pairs)
+  pairs failed due to pair_1  : 836809 (%40.11 of all failed pairs)
+  pairs failed due to pair_2  : 660561 (%31.67 of all failed pairs)
+  pairs failed due to both    : 588694 (%28.22 of all failed pairs)
+
+
+## Next sample (B3 = 2019b)
+
+iu-gen-configs 2019b.txt -o 01_QC
+
+iu-filter-quality-minoche 01_QC/B3.ini 
+
+
+### Results for B3:
+
+(anvio-6.1) [brookeweigel@midway2-0079 01_QC]$ cat B3-STATS.txt 
+number of pairs analyzed      : 42,702,665
+total pairs passed            : 40,561,192 (%94.99 of all pairs)
+  total pair_1 trimmed        : 0 (%0.00 of all passed pairs)
+  total pair_2 trimmed        : 0 (%0.00 of all passed pairs)
+total pairs failed            : 2141473 (%5.01 of all pairs)
+  pairs failed due to pair_1  : 747012 (%34.88 of all failed pairs)
+  pairs failed due to pair_2  : 756055 (%35.31 of all failed pairs)
+  pairs failed due to both    : 638406 (%29.81 of all failed pairs)
+
+
+## Next sample (B4 = 2017a)
+
+iu-gen-configs 2017a.txt -o 01_QC
+
+iu-filter-quality-minoche 01_QC/B4.ini 
+
+### Results for B4:
+
+[brookeweigel@midway2-login1 01_QC]$ cat B4-STATS.txt 
+number of pairs analyzed      : 20,155,897
+total pairs passed            : 18,813,498 (%93.34 of all pairs)
+  total pair_1 trimmed        : 0 (%0.00 of all passed pairs)
+  total pair_2 trimmed        : 0 (%0.00 of all passed pairs)
+total pairs failed            : 1342399 (%6.66 of all pairs)
+  pairs failed due to pair_1  : 350018 (%26.07 of all failed pairs)
+  pairs failed due to pair_2  : 614844 (%45.80 of all failed pairs)
+  pairs failed due to both    : 377537 (%28.12 of all failed pairs)
+
+
+## Next sample (B5 = 2017b)
+
+iu-gen-configs 2017b.txt -o 01_QC
+
+iu-filter-quality-minoche 01_QC/B5.ini 
+
+
+### Results for B5:
+
+(anvio-6.1) [brookeweigel@midway2-0040 01_QC]$ cat B5-STATS.txt 
+number of pairs analyzed      : 23,082,750
+total pairs passed            : 21,529,906 (%93.27 of all pairs)
+  total pair_1 trimmed        : 0 (%0.00 of all passed pairs)
+  total pair_2 trimmed        : 0 (%0.00 of all passed pairs)
+total pairs failed            : 1552844 (%6.73 of all pairs)
+  pairs failed due to pair_1  : 400373 (%25.78 of all failed pairs)
+  pairs failed due to pair_2  : 722713 (%46.54 of all failed pairs)
+  pairs failed due to both    : 429758 (%27.68 of all failed pairs)
+
+
+## Next sample (B6 = 2018a)
+
+iu-gen-configs 2018a.txt -o 01_QC
+
+iu-filter-quality-minoche 01_QC/B6.ini 
+
+### Results for B6: I’m pretty sure that pairs = sequence reads 
+
+(anvio-6.1) [brookeweigel@midway2-0173 01_QC]$ cat B6-STATS.txt 
+number of pairs analyzed      : 11,191,363
+total pairs passed            : 10,353,284 (%92.51 of all pairs)
+  total pair_1 trimmed        : 0 (%0.00 of all passed pairs)
+  total pair_2 trimmed        : 0 (%0.00 of all passed pairs)
+total pairs failed            : 838079 (%7.49 of all pairs)
+  pairs failed due to pair_1  : 200687 (%23.95 of all failed pairs)
+  pairs failed due to pair_2  : 395188 (%47.15 of all failed pairs)
+  pairs failed due to both    : 242204 (%28.90 of all failed pairs)
+
+
+## Last sample (B7 = 2018b)
+
+iu-gen-configs 2018b.txt -o 01_QC
+
+iu-filter-quality-minoche 01_QC/B7.ini 
+
+### Results for B7:
+
+(anvio-6.1) [brookeweigel@midway2-0158 01_QC]$ cat B7-STATS.txt 
+number of pairs analyzed      : 3,868,903
+total pairs passed            : 3,609,035 (%93.28 of all pairs)
+  total pair_1 trimmed        : 0 (%0.00 of all passed pairs)
+  total pair_2 trimmed        : 0 (%0.00 of all passed pairs)
+total pairs failed            : 259868 (%6.72 of all pairs)
+  pairs failed due to pair_1  : 73436 (%28.26 of all failed pairs)
+  pairs failed due to pair_2  : 115395 (%44.41 of all failed pairs)
+  pairs failed due to both    : 71037 (%27.34 of all failed pairs)
+
+
+##############################################################
