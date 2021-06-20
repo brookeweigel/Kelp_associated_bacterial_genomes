@@ -98,7 +98,7 @@ anvi-estimate-genome-taxonomy -c 03_CONTIGS/g1-contigs.db -p 05_NEW_ANVIO_PROFIL
 
 ##################################################
 
-## Next step: Map short reads from all metagenome samples to all contig assemblies
+## Next step: Map short reads from all metagenome samples to all contig assemblies (aka recruitment of metagenomic reads)
 
 ## load your modules here
 module load Anaconda3/2019.03
@@ -119,6 +119,46 @@ rm 04_MAPPING/g1/B1.sam 04_MAPPING/g1/B1-RAW.bam
 ... repeat above steps for all of your samples, mapping them to each contig assembly using Bowtie2 in anvio
 
 ##############################################
+
+Profiling the mapping results with anvi’o:
+## Re-profile databases to contain the mapped reads from all 7 metagenome samples:
+## Now that I have all of the sample reads mapped to each of the 4 contigs databases, I need to reprofile
+## Each single .BAM file to each of the 4 contigs databases, so 7 samples x 4 contigs.db = 28 profiles!
+
+## This is an example for one of my contigs databases (g1-contigs.db), where I profiled each of the 7 BAM files (B1.bam through B7.bam) against each contigs database
+# Note: don't use the flag --cluster-contigs because I will merge multiple profiles at the end!
+anvi-profile -i /project2/cpfister/nereoblade/emily_assemblies/04_MAPPING/g1/B1.bam -c /project2/cpfister/nereoblade/emily_assemblies/03_CONTIGS/g1-contigs.db
+--min-contig-length 2500 -o /project2/cpfister/nereoblade/emily_assemblies/05_NEW_ANVIO_PROFILES/g1/B1 --sample-name B1
+
+anvi-profile -i /project2/cpfister/nereoblade/emily_assemblies/04_MAPPING/g1/B2.bam -c /project2/cpfister/nereoblade/emily_assemblies/03_CONTIGS/g1-contigs.db
+--min-contig-length 2500 -o /project2/cpfister/nereoblade/emily_assemblies/05_NEW_ANVIO_PROFILES/g1/B2 --sample-name B2
+
+anvi-profile -i /project2/cpfister/nereoblade/emily_assemblies/04_MAPPING/g1/B3.bam -c /project2/cpfister/nereoblade/emily_assemblies/03_CONTIGS/g1-contigs.db
+--min-contig-length 2500 -o /project2/cpfister/nereoblade/emily_assemblies/05_NEW_ANVIO_PROFILES/g1/B3 --sample-name B3
+
+anvi-profile -i /project2/cpfister/nereoblade/emily_assemblies/04_MAPPING/g1/B4.bam -c /project2/cpfister/nereoblade/emily_assemblies/03_CONTIGS/g1-contigs.db
+--min-contig-length 2500 -o /project2/cpfister/nereoblade/emily_assemblies/05_NEW_ANVIO_PROFILES/g1/B4 --sample-name B4
+
+anvi-profile -i /project2/cpfister/nereoblade/emily_assemblies/04_MAPPING/g1/B5.bam -c /project2/cpfister/nereoblade/emily_assemblies/03_CONTIGS/g1-contigs.db
+--min-contig-length 2500 -o /project2/cpfister/nereoblade/emily_assemblies/05_NEW_ANVIO_PROFILES/g1/B5 --sample-name B5
+
+anvi-profile -i /project2/cpfister/nereoblade/emily_assemblies/04_MAPPING/g1/B6.bam -c /project2/cpfister/nereoblade/emily_assemblies/03_CONTIGS/g1-contigs.db
+--min-contig-length 2500 -o /project2/cpfister/nereoblade/emily_assemblies/05_NEW_ANVIO_PROFILES/g1/B6 --sample-name B6
+
+anvi-profile -i /project2/cpfister/nereoblade/emily_assemblies/04_MAPPING/g1/B7.bam -c /project2/cpfister/nereoblade/emily_assemblies/03_CONTIGS/g1-contigs.db
+--min-contig-length 2500 -o /project2/cpfister/nereoblade/emily_assemblies/05_NEW_ANVIO_PROFILES/g1/B7 --sample-name B7
+
+##############################################
+
+Generating merged anvi’o profiles:
+## Next, merge profiles together for each contigs database. Merge the 7 profiles for each single contigs database into a single, merged database
+## The asterisk (*) selects any character, so in this case, any character that directly follows a B, selecting B1, B2, B3, B4... to B7.
+
+anvi-merge /project2/cpfister/nereoblade/emily_assemblies/05_NEW_ANVIO_PROFILES/g1/B*/PROFILE.db --enforce-hierarchical-clustering -o 06_NEW_MERGED/g1
+-S squaxin -c /project2/cpfister/nereoblade/emily_assemblies/03_CONTIGS/g1-contigs.db
+
+##############################################
+
 ## Next step: Binning contigs into MAGS (metagenome-assembled-genomes) using anvi-interactive
 
 ## Tips for using anvi-interactive while working on a remote server:
@@ -136,11 +176,68 @@ Example: http://10.50.221.6:8080/
 
 ####################################
 
+## Binning contigs into MAGS (metagenome-assembled-genomes) using anvi-interactive
+
+## First check: estimate how many genomes are in each co-assembled sample with display contigs stats!
+## This will give you a very rough & approximate number of bacterial & archaeal genomes to expect in your contig assemblies, based on single copy core genes
+anvi-display-contigs-stats 03_CONTIGS/g1-contigs.db -I 128.135.112.69
+
+## To cluster contigs into MAGs, manual binning and refinement was performed using “anvi-interactive” with both sequence composition (tetranucleotide frequency) 
+and differential coverage across all samples, following previously described approaches to generate high quality MAGs (Delmont et al. 2018, Shaiber et al. 2020)
+
+## For resources on manual binning, please see:
+https://merenlab.org/tutorials/infant-gut/#manual-identification-of-genomes-in-the-infant-gut-dataset
+https://merenlab.org/data/tara-oceans-mags/
+https://merenlab.org/2017/01/03/loki-the-link-archaea-eukaryota/ (good video tutorials)
+
+## For more information on bin completion & redundancy, please see:
+https://merenlab.org/2016/06/09/assessing-completion-and-contamination-of-MAGs/
+
+## To begin binning, run anvi-interactive in "contigs" mode:
+## Note: only use -I if you are working on a remote server and sending the output to your computer
+
 anvi-interactive -p 05_NEW_ANVIO_PROFILES/B1/PROFILE.db -c 03_CONTIGS/g1-contigs.db -I 128.135.112.69
 
+^ This will display a hierarchical clustering of all contigs in a given database, with concentric circles showing GC content and coverage across your metagenome samples
 
+## Tips:
+- In the general / layers tab of anvi-interactice, click view: sequence composition + differential coverage to bin samples according to both sequence composition & differential coverage across samples
+- Always start with large, coarse bins that have high redundancy, and slowly split & refine your bins into smaller bins until they have low redundauncy using anvi-refine
+- You don't need to bin ALL contigs - some will be left "unbinned" and that is okay
+- Bins should have HIGH completion (>70%) and LOW redundancy (<10%) - redundancy is also called contamination. See resource listred above
+- Completion almost never gets to 100%
+- If you mess up, right click “remove item from bin”
+- Differential coverage across samples is KEY and will help you discriminate between MAGS with similar GC content
+- For differential coverage, follow read mapping instructions above to map short reads to each contig assembly
+- Don’t sacrifice bin completion for getting a slightly lower redundancy value – leads to wasting too much genomic information that could be useful
+- If you are stuck with a bin, try viewing by either sequence composition (GC content) or differential coverage alone – it might help make it clear which contigs should or shouldn’t be part of that bin
+- As you refine your bin collection, save it as a new collection (such as manual_bins_refined) in case you want to go back and look at your unrefined bins later!
+- Double-check all of the bins at the end – go into each one using anvi-refine and manually inspect it!
+- As above, I will emphasize that it is good to double-check everything before moving on to further downstream analyses
 
-### SUPER HELPFUL: In the anvio interface, under “bins,” click “Generate a static summary page” ###
-### this stores an html summary page containing info about all bins, as well as the profile db, and
-### even functional information for each bin! For example, click on the bin then scroll to “Gene calls”
-### and you can click on the “genes” link for each bin to search for functional genes!!
+## Once you begin binning, store your bin collection & give it a name. Every time you run anvi-interactive, you can load this bin collection & continue binning from where you left off
+
+## After you create coarse bins, use “anvi-refine” to inspect each bin individually for contaminating contig clusters with dissimilar GC content and differential coverage
+## Using anvi-refine usually leads to splitting bins into multiple bins with lower redundancy
+## Use ani-refine as follows, with the -b flag for each bin in your collection (-C indicates the bin collection name): 
+
+anvi-refine -p 06_NEW_MERGED/g1/PROFILE.db -c 03_CONTIGS/g1-contigs.db -C Manual_bins_unrefined -b Bin_1 -I 128.135.112.69
+
+####################################
+
+Summarize the binning results
+
+## Once you are satisfied with your bin collection, or if you want to stop and check the stats on your bins, use the following command to summarize your bins:
+anvi-summarize -p 06_NEW_MERGED/g2/PROFILE.db -c 03_CONTIGS/g2-contigs.db -C Manual_bins_refined -o 06_NEW_MERGED/g2/Manual_bins_refined_summary
+
+## Once you are done refining your bin collection, you can rename them and save as a collection of MAGs (metagenome assembled genomes) using this command:
+
+anvi-rename-bins -c 03_CONTIGS/g2-contigs.db -p 06_NEW_MERGED/g2/PROFILE.db --collection-to-read Manual_bins_refined --collection-to-write MAGs
+--min-completion-for-MAG 50 --max-redundancy-for-MAG 10 --call-MAG --report-file 06_NEW_MERGED/g2/MAGs --prefix g2
+
+## Using the --min-completion and --max-redundancy flags will remove bins with less than 50% completion and/or greater than 10% redundancy
+## Other bins (with less than 50% completion and/or greater than 10% redundancy) are still left but are renamed as “bins” and not “MAGs”
+## Delete the low quality bins and save a new collection called “MAGs_final” which only has the final MAGs (not bins)
+
+## Create a summary of your final MAG collection:
+anvi-summarize -p 06_NEW_MERGED/g3/PROFILE.db -c 03_CONTIGS/g3-contigs.db -C Manual_bins_refined -o 06_NEW_MERGED/g3/Manual_bins_refined_summary
