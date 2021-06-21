@@ -1,0 +1,93 @@
+## This is the second script file, focused on analysis of MAGs after quality control through metagenomic binning
+
+##############################################################
+
+## To refresh - Tips for using anvi-interactive while working on a remote server:
+
+## First, look up your computer’s IP address (it will print the # in your terminal):
+/sbin/ip route get 8.8.8.8 | awk '{print $NF;exit}'
+## it will print something like this: 128.135.112.69
+
+## Now, use anvi-interactive, but you need to include your computer’s IP address with the -I option. For example:
+anvi-interactive -p 06_NEW_MERGED/2018/PROFILE.db -c 03_CONTIGS/g4-contigs.db -I 128.135.112.69
+
+## Then go to a browser and type: http://your_IP_address:8080/
+
+Example: http://10.50.221.6:8080/
+
+##############################################################
+
+Generate a non-redundant set of MAGs at 99% average nucleotide identity using anvio
+
+## Use anvi-dereplicate-genomes to collapse redundancy and to get your final set of genomes
+It is important to dereplicate your genomes, becuase if you have two highly similar genomes, they will compete with each other to recruit reads from all of your metagenomes,
+so any of your read recruitment-based analyses will have reads split between the two nearly identical genomes.
+
+## In this study, all MAGS were dereplicated at 99% average nucleotide identity (ANI) using the following command with --similarity-threshold set to 0.99
+## Note that anvi'o uses 'PyANI' by Pritchard et al. (DOI: 10.1039/C5AY02550H) to compute ANI between genomes
+
+anvi-dereplicate-genomes -i MAGs_final_internal_genomes.txt -o 14_Dereplicated_MAGs/ANI_99 --program pyANI --similarity-threshold 0.99 --representative-method Qscore
+-T 4 --log-file 14_Dereplicated_MAGs/ANI_99/anvi_derep.log
+
+## At a similarity threshold of 99%:
+Number of redundant genomes ..................: 13                              
+Final number of dereplicated genomes .........: 67
+
+##############################################################
+
+## Running GTDB-Tk for assignment of metagenome assembled genome (MAG) taxonomy using GTDB-Tk version 1.3.0
+
+## First, use anvi-summarize to get MAGs into FASTA format
+## See: http://merenlab.org/2016/06/22/anvio-tutorial-v2/#anvi-summarize
+
+## Create a summary of the database with the collection (-C) “MAGs_final” 
+anvi-summarize -p 06_NEW_MERGED/g1/PROFILE.db -c 03_CONTIGS/g1-contigs.db -C MAGs_final -o 10_BINNING_SUMMARY/g1_MAGs_final
+
+anvi-summarize will give you all the FASTA files for your bin. You will find them under under:
+YOUR_SUMMARY/bin_by_bin/*/*.fa
+
+## For example, in the g1 summary under bin_by_bin and MAG_00001, there is: g1_MAG_00001-contigs.fa
+
+## Before running GTDB-Tk, you will need to install the program (it is not integrated into anvio currently) & download the bacterial genome databases
+
+See: https://ecogenomics.github.io/GTDBTk/installing/index.html
+
+## I created a new folder called “genome_taxonomy_database” and used “wget” to install the databases:
+wget https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/auxillary_files/gtdbtk_r95_data.tar.gz
+tar xvzf gtdbtk_r95_data.tar.gz
+
+## Finally, I used this code to set the path. Note that you have to set the path every time you run the software:
+export GTDBTK_DATA_PATH=/project2/cpfister/genome_taxonomy_database/release95/
+
+## Follow the GTDB-Tk classify workflow here:
+https://ecogenomics.github.io/GTDBTk/commands/classify_wf.html
+
+*Copied from the above website:
+The classify workflow consists of three steps: identify, align, and classify.
+The identify step calls genes using Prodigal, and uses HMM models and the HMMER package to identify the 120 bacterial and 122 archaeal marker genes used for phylogenetic inference (Parks et al., 2018).
+Multiple sequence alignments (MSA) are obtained by aligning marker genes to their respective HMM model. 
+The align step concatenates the aligned marker genes and filters the concatenated MSA to approximately 5,000 amino acids.
+Finally, the classify step uses pplacer to find the maximum-likelihood placement of each genome in the GTDB-Tk reference tree.
+GTDB-Tk classifies each genome based on its placement in the reference tree, its relative evolutionary divergence,
+and/or average nucleotide identity (ANI) to reference genomes. Results can be impacted by a lack of marker genes or contamination.
+
+## My GTDB-Tk script 
+## Note: If you are running on a server, you will likely need a very high memory allocation (250G if possible) and a long running time (~2+ hours)
+## Use the flag -x to specify the file format as .fa
+
+# Set the path to the reference genome database
+export GTDBTK_DATA_PATH=/project2/cpfister/genome_taxonomy_database/release95/
+
+## Submit the classify code
+gtdbtk classify_wf --batchfile /project2/cpfister/nereoblade/emily_assemblies/Nereo_MAG_paths_2.txt
+--out_dir /project2/cpfister/nereoblade/emily_assemblies/12_GTDB_classify/classify_wf_output -x fa --force --debug
+
+### Output: The two main files output are the summary file, and the reference tree containing those genomes (gtdbtk.bac120.summary.tsv, and gtdbtk.bac120.classify.tree respectively)
+
+##############################################################
+
+
+
+
+
+
