@@ -1,13 +1,4 @@
-## BEGIN ANALYSIS: QUALITY CONTROL & FILTERING ##
-
-## Metagenome sample key:
-B1 = squaxin 
-B2 = 2019a 
-B3 = 2019b 
-B4 = 2017a 
-B5 = 2017b 
-B6 = 2018a
-B7 = 2018b 
+## Begin analysis: quality control of metagenomic reads
 
 ## Start anvio
 
@@ -44,26 +35,36 @@ total pairs failed            : 1736340 (%7.94 of all pairs)
 
 ##############################################################
 
-## Step 2: Assemble short reads into contigs with IDBA-UD (Peng et al. 2012)
+Step 2: Assemble short reads into contigs with IDBA-UD (Peng et al. 2012)
 
-## ADD ASSEMBLY DETAILS FROM EMILY
-anvio snakemake pipeline (see Emily_MAG_assembly_snakemake_pipeline.txt)
-
-Final co-assembly
+## My study contained 7 metagenome samples (B1-B7), which were co-assembled into 4 metagenome assemblies according to sampling location and year, as follows:
 g1 = B1 (Squaxin)
 g2 = B2 (2019a) + B3 (2019b)
 g3 = B4 (2017a) + B5 (2017b)
 g4 = B6 (2018a) + B7 (2018b)
 
-## How to display the stats for the contigs:
+
+## ADD ASSEMBLY DETAILS FROM EMILY
+anvio snakemake pipeline (see Emily_MAG_assembly_snakemake_pipeline.txt)
+
+
+ "idba_ud": {
+        "--min_contig": 1000,
+        "threads": 35,
+        "run": true,
+     
+
+
+## Display the stats for the assembled contigs:
 cd 03_CONTIGS
 
 anvi-display-contigs-stats g1-contigs.db
 
-contigs.fasta are the assembled contigs
-BAM files = files with short reads mapped to contigs
+contigs.fasta are the assembled contigs files
 
-## Create a new anvio profile for each sample assembly:
+##############################################################
+
+Create a new anvio profile for each sample assembly:
 
 Creates a single anvi'o profile database. The default input to this program is
 a BAM file. When it is run on a BAM file, depending on the user parameters,
@@ -86,8 +87,6 @@ anvi-profile -i 04_MAPPING/g1/B1.bam -c 03_CONTIGS/g1-contigs.db --min-contig-le
 ## Merge databases: 2019 = B2 (2019a) + B3 (2019b)
 anvi-merge 05_NEW_ANVIO_PROFILES/B2/PROFILE.db 05_NEW_ANVIO_PROFILES/B3/PROFILE.db --enforce-hierarchical-clustering -c 03_CONTIGS/g2-contigs.db -o 06_NEW_MERGED/2019 -S y2019
 
-## This step was fast, from 2-15 minutes
-
 ## Next step: Importing taxonomy calls for genes using scg-taxonomy
 
 ## Example:
@@ -96,9 +95,9 @@ anvi-run-scg-taxonomy -c 03_CONTIGS/g1-contigs.db --num-parallel-processes 3 --n
 ## Estimate the genomes and taxonomy of bacteria in your metagenome sample (not final taxonomy & you haven't assembled any genomes yet, just a rough estimate)
 anvi-estimate-genome-taxonomy -c 03_CONTIGS/g1-contigs.db -p 05_NEW_ANVIO_PROFILES/B1/PROFILE.db --metagenome-mode --compute-scg-coverages --update-profile-db-with-taxonomy
 
-##################################################
+##############################################################
 
-## Next step: Map short reads from all metagenome samples to all contig assemblies (aka recruitment of metagenomic reads)
+Map short reads from all metagenome samples to all contig assemblies (aka recruitment of metagenomic reads)
 
 ## load your modules here
 module load Anaconda3/2019.03
@@ -118,7 +117,7 @@ rm 04_MAPPING/g1/B1.sam 04_MAPPING/g1/B1-RAW.bam
 
 ... repeat above steps for all of your samples, mapping them to each contig assembly using Bowtie2 in anvio
 
-##############################################
+##############################################################
 
 Profiling the mapping results with anvi’o:
 ## Re-profile databases to contain the mapped reads from all 7 metagenome samples:
@@ -148,7 +147,7 @@ anvi-profile -i /project2/cpfister/nereoblade/emily_assemblies/04_MAPPING/g1/B6.
 anvi-profile -i /project2/cpfister/nereoblade/emily_assemblies/04_MAPPING/g1/B7.bam -c /project2/cpfister/nereoblade/emily_assemblies/03_CONTIGS/g1-contigs.db
 --min-contig-length 2500 -o /project2/cpfister/nereoblade/emily_assemblies/05_NEW_ANVIO_PROFILES/g1/B7 --sample-name B7
 
-##############################################
+##############################################################
 
 Generating merged anvi’o profiles:
 ## Next, merge profiles together for each contigs database. Merge the 7 profiles for each single contigs database into a single, merged database
@@ -157,7 +156,7 @@ Generating merged anvi’o profiles:
 anvi-merge /project2/cpfister/nereoblade/emily_assemblies/05_NEW_ANVIO_PROFILES/g1/B*/PROFILE.db --enforce-hierarchical-clustering -o 06_NEW_MERGED/g1
 -S squaxin -c /project2/cpfister/nereoblade/emily_assemblies/03_CONTIGS/g1-contigs.db
 
-##############################################
+##############################################################
 
 ## Next step: Binning contigs into MAGS (metagenome-assembled-genomes) using anvi-interactive
 
@@ -174,7 +173,7 @@ anvi-interactive -p 06_NEW_MERGED/2018/PROFILE.db -c 03_CONTIGS/g4-contigs.db -I
 
 Example: http://10.50.221.6:8080/
 
-####################################
+##############################################################
 
 ## Binning contigs into MAGS (metagenome-assembled-genomes) using anvi-interactive
 
@@ -223,7 +222,7 @@ anvi-interactive -p 05_NEW_ANVIO_PROFILES/B1/PROFILE.db -c 03_CONTIGS/g1-contigs
 
 anvi-refine -p 06_NEW_MERGED/g1/PROFILE.db -c 03_CONTIGS/g1-contigs.db -C Manual_bins_unrefined -b Bin_1 -I 128.135.112.69
 
-####################################
+##############################################################
 
 Summarize the binning results
 
@@ -241,3 +240,167 @@ anvi-rename-bins -c 03_CONTIGS/g2-contigs.db -p 06_NEW_MERGED/g2/PROFILE.db --co
 
 ## Create a summary of your final MAG collection:
 anvi-summarize -p 06_NEW_MERGED/g3/PROFILE.db -c 03_CONTIGS/g3-contigs.db -C Manual_bins_refined -o 06_NEW_MERGED/g3/Manual_bins_refined_summary
+
+##############################################################
+
+
+
+
+## I am following my own modified version of the TARA oceans workflow (https://merenlab.org/data/tara-oceans-mags/#profiling-957-non-redundant-mags) to 1) create a single FASTA file for my non-redundant MAGs, 2) generate an anvio contigs database, 3) map short reads against the non-redundant MAG database with bowtie2, and 4) re-profile and merge.
+
+
+
+## Before doing the concatenate step to make the final .fasta file with ALL contigs, you need to rename each contig in each FASTA file to contain the MAG names. This will enable you to later confidently track which contig is associated with which MAG in the final output, and create a new bin collection to import into the final profile database:
+
+## Right now, my final bins in: 10_BINNING_SUMMARY/g*_MAGs_final/bin_by_bin/g*_MAG_000**/g*_MAG_000**-contigs.fa
+Look like this: >g1_000000000283
+
+## Which tells me which sample they were assembled from (g1) but NOT which MAG they belong to
+## Fix that by doing this:
+
+module load python
+source activate anvio-7
+
+anvi-script-reformat-fasta g1_MAG_00002.fa  -o ../../FINAL_MAGs/g1_MAG_00002-contigs-renamed.fa  --simplify-names --prefix g1_MAG_00002
+
+anvi-script-reformat-fasta g1_MAG_00003.fa  -o ../../FINAL_MAGs/g1_MAG_00003-contigs-renamed.fa  --simplify-names --prefix g1_MAG_00003
+
+… and so on, for all 67 MAGs. See text file: Rename_bin_fastas
+
+## Now the contigs in this .fa file look like this: >g1_MAG_00001_000000000001
+## So when I go to concatenate all of the .fasta files, the contigs will retain the MAG info. Hooray, I can finally move on!!!!
+
+
+##### Feb. 14: Create final contigs.database ######
+###################################################
+
+### Use the cat command to make a copy of ALL of your contigs into one single fasta file:
+
+cd /project2/cpfister/nereoblade/emily_assemblies/
+
+## The final bins are named: g1_MAG_00006-contigs-renamed.fa
+
+cat 14_Dereplicated_MAGs/FINAL_MAGs/g*_MAG_000**-contigs-renamed.fa > 15_FINAL_MAPPING/Final_MAGS_all.fa
+
+## generate an anvi'o contigs database:
+anvi-gen-contigs-database -f 15_FINAL_MAPPING/Final_MAGS_all.fa -o 15_FINAL_MAPPING/MAGs-CONTIGS.db
+
+(anvio-7) [brookeweigel@midway2-login2 emily_assemblies]$ anvi-gen-contigs-database -f 15_FINAL_MAPPING/Final_MAGS_all.fa -o 15_FINAL_MAPPING/MAGs-CONTIGS.db
+
+
+#####################################################
+##### Feb. 14 - merging profile databases ############
+## Step 2: mapping reads to combined MAG database ###
+#####################################################
+## Mapping short reads for each metagenome (B1-B7) against the 67 non-redundant
+## MAG database (after bowtie2-build command was completed)
+
+## B1 STEP_1
+bowtie2 --threads 4 -x 15_FINAL_MAPPING/MAPPING_MAGs -1 01_QC/B1-QUALITY_PASSED_R1.fastq -2 01_QC/B1-QUALITY_PASSED_R2.fastq -S 15_FINAL_MAPPING/B1.sam
+## B1 STEP_2
+samtools view -F 4 -bS 15_FINAL_MAPPING/B1.sam > 15_FINAL_MAPPING/B1-RAW.bam
+## B1 STEP_3
+anvi-init-bam 15_FINAL_MAPPING/B1-RAW.bam -o 15_FINAL_MAPPING/B1.bam
+## B1 STEP_4
+rm 15_FINAL_MAPPING/B1.sam 15_FINAL_MAPPING/B1-RAW.bam
+
+… and repeats for all metagenome samples B1-B7.
+## This took ~3 hrs and 45 mins to run.
+
+##################################################
+##### Feb. 15 - merging profile databases ########
+#####  Step 3: re-profile and merge .DB ##########
+##################################################
+
+## Profile each .BAM file using this sbatch script
+sbatch Anvi-profile-non-redundant-MAGs.sbatch
+
+## load your modules here
+module load python
+source activate anvio-7
+
+## get to the right directory
+cd /project2/cpfister/nereoblade/emily_assemblies/
+
+## execute your tasks here
+## Note: don't do --cluster-contigs because I will merge multiple profiles at the end
+
+anvi-profile -i 15_FINAL_MAPPING/B1.bam -c 15_FINAL_MAPPING/MAGs-CONTIGS.db --min-contig-length 2500 -o 14_Dereplicated_MAGs/profiles/B1 --sample-name B1 --num-threads 8
+
+anvi-profile -i 15_FINAL_MAPPING/B2.bam -c 15_FINAL_MAPPING/MAGs-CONTIGS.db --min-contig-length 2500 -o 14_Dereplicated_MAGs/profiles/B2 --sample-name B2 --num-threads 8
+
+.. and so on, for B1-B7.
+
+## This took ~20 mins to run.
+
+## Finally, run anvi-merge using Anvi-merge-profiles.sbatch:
+
+anvi-merge 14_Dereplicated_MAGs/profiles/B*/PROFILE.db -c 15_FINAL_MAPPING/MAGs-CONTIGS.db -o 16_FINAL_PROFILE --enforce-hierarchical-clustering
+
+anvi-run-hmms -c 15_FINAL_MAPPING/MAGs-CONTIGS.db --num-threads 5 --just-do-it
+
+
+
+
+## However, after creating a new contigs.db and merging, there are no bin collections… need to create a new bin collection and import it, based on the MAG prefix of of the contigs names. Modified TARA Oceans Workflow (https://merenlab.org/data/tara-oceans-mags/#profiling-957-non-redundant-mags) and submitted as an sbatch script, which worked after a few trial-and-error changes:
+
+## script = Anvi-import-collection-non-redundant-MAGs.sbatch
+
+## load your modules here
+module load python
+source activate anvio-7
+
+## get to the right directory
+cd /project2/cpfister/nereoblade/emily_assemblies/
+
+## execute your tasks here
+# create an anvi'o collection file for non-redundant MAGs:
+for split_name in `sqlite3 15_FINAL_MAPPING/MAGs-CONTIGS.db 'select split from splits_basic_info'`
+do
+    # in this loop $split_name goes through names like this: ANW_MAG_00001_000000000001,
+    # ANW_MAG_00001_000000000002, ANW_MAG_00001_000000000003, ...; so we can extract
+    # the MAG name it belongs to:
+    MAG=`echo $split_name | awk 'BEGIN{FS="_"}{print $1"_"$2"_"$3}'`
+
+    # print out the collections line
+    echo -e "$split_name\t$MAG"
+done > NON-REDUNDANT-MAGs-COLLECTION.txt
+
+# import the collection into the anvi'o merged profile database
+# for non-redundant MAGs:
+anvi-import-collection NON-REDUNDANT-MAGs-COLLECTION.txt \
+                       -c 15_FINAL_MAPPING/MAGs-CONTIGS.db \
+                       -p 16_FINAL_PROFILE/PROFILE.db \
+                       -C Final_MAGs
+
+# summarize the non-redundant MAGs collection:
+anvi-summarize -c 15_FINAL_MAPPING/MAGs-CONTIGS.db \
+               -p 16_FINAL_PROFILE/PROFILE.db \
+               -C Final_MAGs \
+               -o 16_FINAL_PROFILE/Final_MAGs_summary
+
+
+anvi-setup-scg-taxonomy --num-threads 5
+
+## Finished running on new contigs.db
+anvi-run-scg-taxonomy -c 15_FINAL_MAPPING/MAGs-CONTIGS.db --num-threads 5
+
+
+anvi-run-ncbi-cogs -c 15_FINAL_MAPPING/MAGs-CONTIGS.db --num-threads 5
+
+## Run kegg kofams for each contigs database
+anvi-run-kegg-kofams -c /project2/cpfister/nereoblade/emily_assemblies/03_CONTIGS/g1-contigs.db --kegg-data-dir /project2/cpfister/KEGG_database/KEGG/ -T 6 --just-do-it
+
+## Then export functions
+anvi-export-functions -c /project2/cpfister/nereoblade/emily_assemblies/03_CONTIGS/g1-contigs.db -o /project2/cpfister/nereoblade/emily_assemblies/03_CONTIGS/g1-functions.txt
+
+
+
+
+FINAL COLLECTION HERE:
+
+## Note: when you use -C it shows anvi-interactive in bin mode! Aka displays bins and not contigs 
+anvi-interactive -p 16_FINAL_PROFILE/PROFILE.db -c 15_FINAL_MAPPING/MAGs-CONTIGS.db -C Final_MAGs -I 128.135.112.69 -P 8333
+
+##############################################################
+
