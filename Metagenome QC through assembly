@@ -189,6 +189,9 @@ Step 7: Binning contigs into MAGS (metagenome-assembled-genomes) manually using 
 ## This will give you a very rough & approximate number of bacterial & archaeal genomes to expect in your contig assemblies, based on single copy core genes
 anvi-display-contigs-stats 03_CONTIGS/g1-contigs.db -I your_IP_address
 
+## While binning, microbial taxonomy was estimated within anvio using “anvi-run-scg-taxonomy,” which searches single-copy genes from each genome against the Genome Taxonomy Database (GTDB):
+anvi-run-scg-taxonomy -c CONTIGS.db --num-threads 5
+
 ## To cluster (or "bin") contigs into MAGs, manual binning and refinement was performed using “anvi-interactive” with both sequence composition (tetranucleotide frequency) 
 and differential coverage across all samples, following previously described approaches to generate high quality MAGs (Delmont et al. 2018, Shaiber et al. 2020)
 
@@ -219,7 +222,7 @@ anvi-interactive -p 05_NEW_ANVIO_PROFILES/B1/PROFILE.db -c 03_CONTIGS/g1-contigs
 - Don’t sacrifice bin completion for getting a slightly lower redundancy value – leads to wasting too much genomic information that could be useful
 - If you are stuck with a bin, try viewing by either sequence composition (GC content) or differential coverage alone – it might help make it clear which contigs should or shouldn’t be part of that bin
 - As you refine your bin collection, save it as a new collection (such as manual_bins_refined) in case you want to go back and look at your unrefined bins later!
-- Double-check all of the bins at the end – go into each one using anvi-refine and manually inspect it!
+- Double-check all of the bins at the end – go into each one using anvi-refine and manually inspect it!a
 
 ## Once you begin binning, store your bin collection & give it a name. Every time you run anvi-interactive, you can load this bin collection & continue binning from where you left off
 
