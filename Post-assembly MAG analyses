@@ -1,25 +1,27 @@
-## This is the second script file, focused on analysis of MAGs after quality control through metagenomic binning
+This is the second script file, focused on analysis of MAGs after sequence quality control, contig assembly and metagenomic binning
 
 ##############################################################
 
-## To refresh - Tips for using anvi-interactive while working on a remote server:
+## Refresher: Tips for using anvi-interactive while working on a remote server:
 
 ## First, look up your computer’s IP address (it will print the # in your terminal):
 /sbin/ip route get 8.8.8.8 | awk '{print $NF;exit}'
-## it will print something like this: 121.135.122
+## it will print something like this: 141.135.122.69
 
 ## Now, use anvi-interactive, but you need to include your computer’s IP address with the -I option. For example:
-anvi-interactive -p 06_NEW_MERGED/2018/PROFILE.db -c 03_CONTIGS/g4-contigs.db -I 121.135.122.69
+anvi-interactive -p 06_NEW_MERGED/2018/PROFILE.db -c 03_CONTIGS/g4-contigs.db -I 141.135.122.69
 
 ## Then go to a browser and type: http://your_IP_address:8080/
 
 ##############################################################
 
-Generate a non-redundant set of MAGs at 99% average nucleotide identity using anvio
+Step 1: Curation of a non-redundant MAG dataset
 
-## Use anvi-dereplicate-genomes to collapse redundancy and to get your final set of genomes
-It is important to dereplicate your genomes, becuase if you have two highly similar genomes, they will compete with each other to recruit reads from all of your metagenomes,
-so any of your read recruitment-based analyses will have reads split between the two nearly identical genomes.
+## In order to identify highly similar MAGs and pick representative genomes out of the redundant MAGs, the command “anvi-dereplicate-genomes”
+was used to dereplicate the final MAG collection at 99% average nucleotide identity (ANI) using PyANI (Pritchard et al. 2016). 
+
+## Note: It is important to dereplicate your genomes, becuase if you have two highly similar genomes, they will compete with each other to recruit reads from your metagenomes,
+so any of your read recruitment-based analyses will have reads split between the two nearly identical genomes
 
 ## In this study, all MAGS were dereplicated at 99% average nucleotide identity (ANI) using the following command with --similarity-threshold set to 0.99
 ## Note that anvi'o uses 'PyANI' by Pritchard et al. (DOI: 10.1039/C5AY02550H) to compute ANI between genomes
@@ -29,25 +31,23 @@ anvi-dereplicate-genomes -i MAGs_final_internal_genomes.txt -o 14_Dereplicated_M
 
 ## At a similarity threshold of 99%:
 Number of redundant genomes ..................: 13                              
-Final number of dereplicated genomes .........: 67
+Final number of dereplicated genomes .........: 66
 
 ##############################################################
 
-## Running GTDB-Tk for assignment of metagenome assembled genome (MAG) taxonomy using GTDB-Tk version 1.3.0
+Step 2: Taxonomy assignment of MAGs using the Genome Taxonomy Database
 
-## First, use anvi-summarize to get MAGs into FASTA format
+## Taxonomy was assigned to each MAG using GTDB-Tk (v1.3.0; Chaumeil et al. 2019) outside of anvio, which uses a set of 120 concatenated bacterial gene markers to place MAGs
+in a reference tree based on the Genome Taxonomy Database (release95, Parks et al. 2020), using both FastANI (Jain et al. 2018) and pplacer (Matsen et al. 2010).
+
+## First, to generate contigs.fasta files for GTDB-Tk classification, MAGs were exported from anvio using anvi-summarize to get MAGs into FASTA format:
 ## See: http://merenlab.org/2016/06/22/anvio-tutorial-v2/#anvi-summarize
-
-## Create a summary of the database with the collection (-C) “MAGs_final” 
 anvi-summarize -p 06_NEW_MERGED/g1/PROFILE.db -c 03_CONTIGS/g1-contigs.db -C MAGs_final -o 10_BINNING_SUMMARY/g1_MAGs_final
 
 anvi-summarize will give you all the FASTA files for your bin. You will find them under under:
 YOUR_SUMMARY/bin_by_bin/*/*.fa
 
-## For example, in the g1 summary under bin_by_bin and MAG_00001, there is: g1_MAG_00001-contigs.fa
-
 ## Before running GTDB-Tk, you will need to install the program (it is not integrated into anvio currently) & download the bacterial genome databases
-
 See: https://ecogenomics.github.io/GTDBTk/installing/index.html
 
 ## I created a new folder called “genome_taxonomy_database” and used “wget” to install the databases:
@@ -57,35 +57,57 @@ tar xvzf gtdbtk_r95_data.tar.gz
 ## Finally, I used this code to set the path. Note that you have to set the path every time you run the software:
 export GTDBTK_DATA_PATH=/project2/cpfister/genome_taxonomy_database/release95/
 
-## Follow the GTDB-Tk classify workflow here:
+## I followed the GTDB-Tk classify workflow here:
 https://ecogenomics.github.io/GTDBTk/commands/classify_wf.html
 
-*Copied from the above website:
-The classify workflow consists of three steps: identify, align, and classify.
-The identify step calls genes using Prodigal, and uses HMM models and the HMMER package to identify the 120 bacterial and 122 archaeal marker genes used for phylogenetic inference (Parks et al., 2018).
-Multiple sequence alignments (MSA) are obtained by aligning marker genes to their respective HMM model. 
-The align step concatenates the aligned marker genes and filters the concatenated MSA to approximately 5,000 amino acids.
-Finally, the classify step uses pplacer to find the maximum-likelihood placement of each genome in the GTDB-Tk reference tree.
-GTDB-Tk classifies each genome based on its placement in the reference tree, its relative evolutionary divergence,
-and/or average nucleotide identity (ANI) to reference genomes. Results can be impacted by a lack of marker genes or contamination.
-
-## My GTDB-Tk script 
+## Running GTDB-Tk for assignment of metagenome assembled genome (MAG) taxonomy using GTDB-Tk version 1.3.0
 ## Note: If you are running on a server, you will likely need a very high memory allocation (250G if possible) and a long running time (~2+ hours)
 ## Use the flag -x to specify the file format as .fa
 
 # Set the path to the reference genome database
 export GTDBTK_DATA_PATH=/project2/cpfister/genome_taxonomy_database/release95/
 
-## Submit the classify code
-gtdbtk classify_wf --batchfile /project2/cpfister/nereoblade/emily_assemblies/Nereo_MAG_paths_2.txt
---out_dir /project2/cpfister/nereoblade/emily_assemblies/12_GTDB_classify/classify_wf_output -x fa --force --debug
+## Submit the GTDB-Tk classify code
+# Set the path to the reference genome database
+export GTDBTK_DATA_PATH=/project2/cpfister/genome_taxonomy_database/release95/
 
-### Output: The two main files output are the summary file, and the reference tree containing those genomes (gtdbtk.bac120.summary.tsv, and gtdbtk.bac120.classify.tree respectively)
+## Submit the classify code (I used an sbatch script on a remote server)
+gtdbtk classify_wf --batchfile /project2/cpfister/nereoblade/emily_assemblies/Nereo_MAG_paths_2.txt
+--out_dir /project2/cpfister/nereoblade/emily_assemblies/13_GTDB_classify/classify_wf_output -x fa --force --debug
+
+### Output: The two main files output are the summary file (gtdbtk.bac120.summary.tsv) and the reference tree containing those genomes (gtdbtk.bac120.classify.tree)
 
 ##############################################################
 
+Step 3: Annotate contigs databases and estimate functional gene content and metabolic pathways contained in each MAG
 
+## Downloads and organizes a local copy of the KOfam / KEGG database for use in function annotation
+anvi-setup-kegg-kofams
 
+## Downloads and organizes a local copy of NCBI’s COGs database for use in function annotation
+anvi-setup-ncbi-cogs --num-threads 5
 
+## Downloads and organizes a local copy of EBI’s Pfam database for use in function annotation
+anvi-setup-pfams
+
+## Run KEGG kOfam annotation for each contigs database
+anvi-run-kegg-kofams -c contigs.db --num-threads 6
+
+## Run Pfam annotation for each contigs database
+anvi-run-pfams -c contigs.db --num-threads 6
+
+## Run COG annotation for each contigs database
+anvi-run-ncbi-cogs -c contigs.db --num-threads 6
+
+## Now that your contigs databases are annotated with all 3 gene databases, look at functions using "anvi-export-functions":
+anvi-export-functions -c contigs.db -o All-functions.txt
+
+## Run anvi-estimate-metabolism 
+## Note: If you also provide a profile database and a collection name, anvi'o will estimate metabolism separately for each MAG in your collection:
+anvi-estimate-metabolism -c contigs.db -p profile.db -C Final_MAGs -O Estimated_metabolisms 
+
+##############################################################
+
+Step 4: 
 
 
