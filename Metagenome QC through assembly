@@ -226,6 +226,7 @@ anvi-interactive -p 05_NEW_ANVIO_PROFILES/B1/PROFILE.db -c 03_CONTIGS/g1-contigs
 
 ## Once you begin binning, store your bin collection & give it a name. Every time you run anvi-interactive, you can load this bin collection & continue binning from where you left off
 
+## Bacterial bins were individually inspected using “anvi-refine,” where they were checked for contaminating contig clusters with dissimilar GC content and differential coverage
 ## After you create coarse bins, use “anvi-refine” to inspect each bin individually for contaminating contig clusters with dissimilar GC content and differential coverage
 ## Using anvi-refine usually leads to splitting bins into multiple bins with lower redundancy
 ## Use ani-refine as follows, with the -b flag for each bin in your collection (-C indicates the bin collection name): 
@@ -236,6 +237,7 @@ anvi-refine -p 06_NEW_MERGED/g1/PROFILE.db -c 03_CONTIGS/g1-contigs.db -C Manual
 
 Step 8: Summarize the binning results
 
+## Final bin collections were checked for completeness and contamination (also referred to as redundancy) using “anvi-summarize"
 ## Once you are satisfied with your bin collection, or if you want to stop and check the stats on your bins, use the following command to summarize your bins:
 anvi-summarize -p 06_NEW_MERGED/g2/PROFILE.db -c 03_CONTIGS/g2-contigs.db -C Manual_bins_refined -o 06_NEW_MERGED/g2/Manual_bins_refined_summary
 
