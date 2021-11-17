@@ -6,14 +6,12 @@
 
 ## First, look up your computer’s IP address (it will print the # in your terminal):
 /sbin/ip route get 8.8.8.8 | awk '{print $NF;exit}'
-## it will print something like this: 128.135.112.69
+## it will print something like this: 121.135.122
 
 ## Now, use anvi-interactive, but you need to include your computer’s IP address with the -I option. For example:
-anvi-interactive -p 06_NEW_MERGED/2018/PROFILE.db -c 03_CONTIGS/g4-contigs.db -I 128.135.112.69
+anvi-interactive -p 06_NEW_MERGED/2018/PROFILE.db -c 03_CONTIGS/g4-contigs.db -I 121.135.122.69
 
 ## Then go to a browser and type: http://your_IP_address:8080/
-
-Example: http://10.50.221.6:8080/
 
 ##############################################################
 
