@@ -1,0 +1,124 @@
+In this study, we generated 8 novel MAGs of Granulosicoccus sp., including 6 of high quality (>90% completion).
+We generated a pangenome with these 8 MAGs, along with two publicly available Granulosicoccus genomes.
+
+##############################################################
+
+## First, we downloaded two external Granulosicoccus genomes from NCBI (the only two Granulosicoccus genomes available at the time):
+## This is the complete isolate genome of Granulosicoccus antarcticus type strain IMCC3135 (Kang et al. 2018): https://www.ncbi.nlm.nih.gov/assembly/GCF_002215215.1
+## This one is a MAG of Granulosicoccus isolated from a bottlenose dolphin’s mouth (Dudek et al. 2017): https://www.ncbi.nlm.nih.gov/assembly/GCA_002746645.1
+
+## First, reformat the downloaded fasta files using anvio:
+anvi-script-reformat-fasta --simplify-names Granulosicoccus_antarcticus_genomic.fna -o Granulosicoccus_antarcticus.fasta
+anvi-script-reformat-fasta --simplify-names Granulosicoccus_sp002746645_genomic.fna -o Granulosicoccus_sp002746645.fasta
+
+## Generate contigs databases with fasta files:
+## Note: before doing this, I had to edit the .fasta file decline (>name) to remove spaces, etc.
+anvi-gen-contigs-database -f Granulosicoccus_antarcticus.fasta -n Granulosicoccus_antarcticus
+anvi-gen-contigs-database -f Granulosicoccus_sp002746645.fasta -n Granulosicoccus_sp002746645
+
+## Run hmms on new contigs databases:
+anvi-run-hmms -c Pangenome_new/CONTIGS_Granulosicoccus_antarcticus.db --just-do-it
+anvi-run-hmms -c Pangenome_new/CONTIGS_Granulosicoccus_sp002746645.db --just-do-it
+
+## Annotate new contigs databases with NCBI COGs, Pfams and KEGG / KOfams:
+## Run cogs:
+anvi-run-ncbi-cogs -c /project2/cpfister/nereoblade/emily_assemblies/11_PANGENOME/Pangenome_new/CONTIGS_Granulosicoccus_sp002746645.db -T 8
+anvi-run-ncbi-cogs -c /project2/cpfister/nereoblade/emily_assemblies/11_PANGENOME/Pangenome_new/CONTIGS_Granulosicoccus_antarcticus.db -T 8
+
+## Run pfams:
+anvi-run-pfams -c /project2/cpfister/nereoblade/emily_assemblies/11_PANGENOME/Pangenome_new/CONTIGS_Granulosicoccus_sp002746645.db -T 8
+anvi-run-pfams -c /project2/cpfister/nereoblade/emily_assemblies/11_PANGENOME/Pangenome_new/CONTIGS_Granulosicoccus_antarcticus.db -T 8
+
+## Run kegg kofams:
+anvi-run-kegg-kofams -c /project2/cpfister/nereoblade/emily_assemblies/11_PANGENOME/Pangenome_new/CONTIGS_Granulosicoccus_sp002746645.db -T 8
+anvi-run-kegg-kofams -c /project2/cpfister/nereoblade/emily_assemblies/11_PANGENOME/Pangenome_new/CONTIGS_Granulosicoccus_antarcticus.db -T 8
+
+##############################################################
+
+
+## First, we made a database of all 10 genomes using “anvi-gen-genomes-storage”:
+
+## Next, we generated the pangenome using “anvi-pan-genome” (minbit set to 0.5 and mcl-inflation set to 10), 
+which uses NCBI’s BLAST to quantify sequence similarity within and between genomes. 
+
+## We used anvi’o to analyze and visualize the pangenome using “anvi-display-pan”: 
+
+## To obtain functional gene annotations and amino acid sequences from all genes within each Granulosicoccus genome, we used “anvi-summarize”: 
+
+## To search for KEGG metabolic pathways present in the pangenome, we used “anvi-estimate-metabolism” with an e-value threshold of 1e-05 and a bitscore fraction of 0.5:
+
+## To compare the average nucleotide identity (ANI) among Granulosicoccus genomes, we used “anvi-compute-genome-similarity” with PyANI (Pritchard et al. 2016):
+
+
+
+
+
+##############################################################
+
+Step 5: 
+
+
+
+
+
+
+
+
+
+## Next, I will need to re-make the pangenome after including the 2 external genomes:
+PUT ALL NEW CONTENT INTO THIS FOLDER: Pangenome_new/
+
+## Step 1: Create a new anvi’o genomes storage using the program anvi-gen-genomes-storage
+
+## First, need the internal genomes file: Granulosicoccus_MAGs.txt (made in excel, saved as .txt tab format)
+## Next, need the external genomes file: Granulosicoccus_external_genomes.txt (made in excel, saved as .txt)
+## NOTE: “Config Error: Sorry, genome name "2019_g1_MAG_00002" can't start with a digit. Long story. Please specify a name that starts with an ASCII letter.“ —> Changed to “T_2019_g1_MAG_00002”, etc.
+
+scp /Users/brookeweigel/Documents/1_UChicagoPhD/2_Research/01_2020_METAGENOMES/METAGENOMES_Anvio_MAGs/Granulosicoccus_MAGs.txt brookeweigel@midway2.rcc.uchicago.edu:/project2/cpfister/nereoblade/emily_assemblies/11_PANGENOME/Pangenome_new/
+
+scp /Users/brookeweigel/Documents/1_UChicagoPhD/2_Research/01_2020_METAGENOMES/METAGENOMES_Anvio_MAGs/Granulosicoccus_external_genomes.txt brookeweigel@midway2.rcc.uchicago.edu:/project2/cpfister/nereoblade/emily_assemblies/11_PANGENOME/Pangenome_new/
+
+## Now, generate “anvio genomes storage” using BOTH internal and external genomes:
+anvi-gen-genomes-storage -i 11_PANGENOME/Pangenome_new/Granulosicoccus_MAGs.txt -e 11_PANGENOME/Pangenome_new/Granulosicoccus_external_genomes.txt --gene-caller prodigal -o 11_PANGENOME/Pangenome_new/ALL-GRANULO-GENOMES.db
+
+## Okay, so this was not working with anvio development version, but not it works with anvio version 7! Strange!
+Development version ERROR: Config Error: Ehem. Someone just called `init_contig_sequences` with gener caller ids of interest AND split names of interest. Someone should make up their mind and go for only one of those.
+
+## This code worked in anvio v.7:
+(anvio-7) [brookeweigel@midway2-login2 emily_assemblies]$ anvi-gen-genomes-storage -i 11_PANGENOME/Pangenome_new/Granulosicoccus_MAGs.txt -e 11_PANGENOME/Pangenome_new/Granulosicoccus_external_genomes.txt --gene-caller prodigal -o 11_PANGENOME/Pangenome_new/ALL-GRANULO-GENOMES.db
+                                                                
+## Second step, run the “anvi pangenome code” using a BASH script
+sbatch Anvi-pangenome-with-external.sbatch
+
+## When this finishes, the new pangenome should be ready to view!
+## This worked, new pangenome: 11_PANGENOME/Pangenome_new/Granulosicoccus_pangenome-PAN.db
+
+## Check on the status here: 
+squeue --user=brookeweigel
+
+### View the new pangenome ###
+
+cd /project2/cpfister/nereoblade/emily_assemblies/
+
+## Check current number
+/sbin/ip route get 8.8.8.8 | awk '{print $NF;exit}'
+
+## Load anvio
+module load python
+source activate anvio-7
+
+## Display pangeome
+anvi-display-pan -p 11_PANGENOME/Pangenome_new/Granulosicoccus_pangenome-PAN.db -g 11_PANGENOME/Pangenome_new/ALL-GRANULO-GENOMES.db -I 128.135.112.69 -P 8333
+
+http://128.135.112.69:8333
+
+## You can summarize a pangenome collection using the program anvi-summarize:
+## But first I need a bin collection to summarize:
+anvi-script-add-default-collection -p 11_PANGENOME/Pangenome_new/Granulosicoccus_pangenome-PAN.db -b all_clusters -C default
+
+Collections ..................................: The collection 'default' that describes 13073 splits in a single bin was successfully added to the to the database at '11_PANGENOME/Pangenome_new/Granulosicoccus_pangenome-PAN.db'.
+
+## Create a summary of the pangenome clusters
+anvi-summarize -p 11_PANGENOME/Pangenome_new/Granulosicoccus_pangenome-PAN.db -g 11_PANGENOME/Pangenome_new/ALL-GRANULO-GENOMES.db -C default -o 11_PANGENOME/Pangenome_new/Granulosicoccus_pangenome_new_summary
+
+## Summary now exists in 11_PANGENOME/Pangenome_new/Granulosicoccus_pangenome_new_summary
