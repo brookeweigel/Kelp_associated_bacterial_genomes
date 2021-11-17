@@ -1,10 +1,5 @@
 ## Begin analysis: quality control of metagenomic reads
 
-## Start anvio
-
-module load Anaconda3/2019.03
-conda activate anvio-6.1
-
 Step 1: Quality Control
 ## Within anvio, use iu-gen-configs program with samples.txt to create config files for illumina-utils
 ## This tells the program where the input files are, as well as where the output should go
@@ -81,18 +76,11 @@ anvi-display-contigs-stats g4-contigs.db
 
 ##############################################################
 
-Create a new anvio profile for each sample assembly:
+Step 3: Create a new anvio profile for each sample assembly:
 
-Creates a single anvi'o profile database. The default input to this program is
-a BAM file. When it is run on a BAM file, depending on the user parameters,
-the program quantifies coverage per nucleotide position (and averages them out
-per contig), calculates single-nucleotide, single-codon, and single-amino acid
-variants, and stores these data into appropriate tables. 
-
-## Start anvio
-
-module load Anaconda3/2019.03
-conda activate anvio-6.1
+From anvio about the code "anvi-profile": Creates a single anvi'o profile database. The default input to this program is a BAM file.
+When it is run on a BAM file, depending on the user parameters, the program quantifies coverage per nucleotide position (and averages them out per contig),
+calculates single-nucleotide, single-codon, and single-amino acid variants, and stores these data into appropriate tables."
 
 ## Example code for creating an anvio profile database for a single metagenome sample
 anvi-profile -i 04_MAPPING/g1/B1.bam -c 03_CONTIGS/g1-contigs.db --min-contig-length 2500 -o 05_NEW_ANVIO_PROFILES/Squaxin --sample-name Squaxin
@@ -114,13 +102,9 @@ anvi-estimate-genome-taxonomy -c 03_CONTIGS/g1-contigs.db -p 05_NEW_ANVIO_PROFIL
 
 ##############################################################
 
-Map short reads from all metagenome samples to all contig assemblies (aka recruitment of metagenomic reads)
+Step 4: Map short reads from all metagenome samples to all contig assemblies (aka recruitment of metagenomic short reads)
 
-## load your modules here
-module load Anaconda3/2019.03
-conda activate anvio-6.1
-
-## Example: mapping samples to g1 assembly in Bowtie2
+## Example: Mapping metagenome reads to g1 assembly in Bowtie2
 
 ## Mapping sample B1 to assembly g1... repeat for all samples (B1-B7)
 ## STEP_1
@@ -136,10 +120,9 @@ rm 04_MAPPING/g1/B1.sam 04_MAPPING/g1/B1-RAW.bam
 
 ##############################################################
 
-Profiling the mapping results with anvi’o:
+Step 5: Profile the mapping results with anvi’o:
 ## Re-profile databases to contain the mapped reads from all 7 metagenome samples:
-## Now that I have all of the sample reads mapped to each of the 4 contigs databases, I need to reprofile
-## Each single .BAM file to each of the 4 contigs databases, so 7 samples x 4 contigs.db = 28 profiles!
+## Now that I have all of the sample reads mapped to each of the 4 contigs databases, I need to reprofile each single .BAM file to each of the 4 contigs databases, so 7 samples x 4 contigs.db = 28 profiles!
 
 ## This is an example for one of my contigs databases (g1-contigs.db), where I profiled each of the 7 BAM files (B1.bam through B7.bam) against each contigs database
 # Note: don't use the flag --cluster-contigs because I will merge multiple profiles at the end!
@@ -166,7 +149,7 @@ anvi-profile -i /project2/cpfister/nereoblade/emily_assemblies/04_MAPPING/g1/B7.
 
 ##############################################################
 
-Generating merged anvi’o profiles:
+Step 6: Generating merged anvi’o profiles:
 ## Next, merge profiles together for each contigs database. Merge the 7 profiles for each single contigs database into a single, merged database
 ## The asterisk (*) selects any character, so in this case, any character that directly follows a B, selecting B1, B2, B3, B4... to B7.
 
@@ -175,28 +158,27 @@ anvi-merge /project2/cpfister/nereoblade/emily_assemblies/05_NEW_ANVIO_PROFILES/
 
 ##############################################################
 
-## Next step: Binning contigs into MAGS (metagenome-assembled-genomes) using anvi-interactive
+Step 7: Binning contigs into MAGS (metagenome-assembled-genomes) manually using anvi-interactive
 
 ## Tips for using anvi-interactive while working on a remote server:
-
 ## First, look up your computer’s IP address (it will print the # in your terminal):
 /sbin/ip route get 8.8.8.8 | awk '{print $NF;exit}'
-## it will print something like this: 128.135.112.69
+## it will print something like this: 121.145.122.69
 
 ## Now, use anvi-interactive, but you need to include your computer’s IP address with the -I option. For example:
-anvi-interactive -p 06_NEW_MERGED/2018/PROFILE.db -c 03_CONTIGS/g4-contigs.db -I 128.135.112.69
+anvi-interactive -p 06_NEW_MERGED/2018/PROFILE.db -c 03_CONTIGS/g4-contigs.db -I 121.145.122.69
 
 ## Then go to a browser and type: http://your_IP_address:8080/
 
-Example: http://10.50.221.6:8080/
+Example: http://121.145.122.69:8080/
 
 ##############################################################
 
-## Binning contigs into MAGS (metagenome-assembled-genomes) using anvi-interactive
+Step 7: Binning contigs into MAGS (metagenome-assembled-genomes) manually using anvi-interactive
 
 ## First check: estimate how many genomes are in each co-assembled sample with display contigs stats!
 ## This will give you a very rough & approximate number of bacterial & archaeal genomes to expect in your contig assemblies, based on single copy core genes
-anvi-display-contigs-stats 03_CONTIGS/g1-contigs.db -I 128.135.112.69
+anvi-display-contigs-stats 03_CONTIGS/g1-contigs.db -I your_IP_address
 
 ## To cluster contigs into MAGs, manual binning and refinement was performed using “anvi-interactive” with both sequence composition (tetranucleotide frequency) 
 and differential coverage across all samples, following previously described approaches to generate high quality MAGs (Delmont et al. 2018, Shaiber et al. 2020)
@@ -212,7 +194,7 @@ https://merenlab.org/2016/06/09/assessing-completion-and-contamination-of-MAGs/
 ## To begin binning, run anvi-interactive in "contigs" mode:
 ## Note: only use -I if you are working on a remote server and sending the output to your computer
 
-anvi-interactive -p 05_NEW_ANVIO_PROFILES/B1/PROFILE.db -c 03_CONTIGS/g1-contigs.db -I 128.135.112.69
+anvi-interactive -p 05_NEW_ANVIO_PROFILES/B1/PROFILE.db -c 03_CONTIGS/g1-contigs.db -I your_IP_address
 
 ^ This will display a hierarchical clustering of all contigs in a given database, with concentric circles showing GC content and coverage across your metagenome samples
 
@@ -237,7 +219,7 @@ anvi-interactive -p 05_NEW_ANVIO_PROFILES/B1/PROFILE.db -c 03_CONTIGS/g1-contigs
 ## Using anvi-refine usually leads to splitting bins into multiple bins with lower redundancy
 ## Use ani-refine as follows, with the -b flag for each bin in your collection (-C indicates the bin collection name): 
 
-anvi-refine -p 06_NEW_MERGED/g1/PROFILE.db -c 03_CONTIGS/g1-contigs.db -C Manual_bins_unrefined -b Bin_1 -I 128.135.112.69
+anvi-refine -p 06_NEW_MERGED/g1/PROFILE.db -c 03_CONTIGS/g1-contigs.db -C Manual_bins_unrefined -b Bin_1 -I your_IP_address
 
 ##############################################################
 
@@ -417,7 +399,7 @@ anvi-export-functions -c /project2/cpfister/nereoblade/emily_assemblies/03_CONTI
 FINAL COLLECTION HERE:
 
 ## Note: when you use -C it shows anvi-interactive in bin mode! Aka displays bins and not contigs 
-anvi-interactive -p 16_FINAL_PROFILE/PROFILE.db -c 15_FINAL_MAPPING/MAGs-CONTIGS.db -C Final_MAGs -I 128.135.112.69 -P 8333
+anvi-interactive -p 16_FINAL_PROFILE/PROFILE.db -c 15_FINAL_MAPPING/MAGs-CONTIGS.db -C Final_MAGs -I your_IP_address
 
 ##############################################################
 
