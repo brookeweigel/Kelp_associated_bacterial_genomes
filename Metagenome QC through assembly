@@ -5,7 +5,7 @@
 module load Anaconda3/2019.03
 conda activate anvio-6.1
 
-## Step 1: Quality Control
+Step 1: Quality Control
 ## Within anvio, use iu-gen-configs program with samples.txt to create config files for illumina-utils
 ## This tells the program where the input files are, as well as where the output should go
 ## Make output directory (01_QC)
@@ -18,7 +18,9 @@ B4	    B4_S4_L002_R1_001.fastq	 B4_S4_L002_R2_001.fastq
 
 ## The above code created the file “B2.ini” (~ 5 mins run time).
 ## Repeat iu-gen-configs for each of your metagenome samples!
-## Now you are ready to run quality filtering for each of your samples with the following code:
+
+# Raw sequences from forward and reverse reads were checked for sequence quality using “filter-quality-minoche” (Minoche et al. 2011)
+# Within anvio, we used the following code:
 
 iu-filter-quality-minoche 01_QC/B1.ini 
 
@@ -35,32 +37,47 @@ total pairs failed            : 1736340 (%7.94 of all pairs)
 
 ##############################################################
 
-Step 2: Assemble short reads into contigs with IDBA-UD (Peng et al. 2012)
+Step 2: Quality sequences were assembled into contigs using IDBA-UD (Peng et al. 2012) with a minimum contig length of 1,000.
 
-## My study contained 7 metagenome samples (B1-B7), which were co-assembled into 4 metagenome assemblies according to sampling location and year, as follows:
+## Metagenomes collected from the same kelp forest location and same year were co-assembled, resulting in 4 total assemblies.
+## We did not assemble across multiple years or locations to avoid chimeric genomes. 
+
+## Names of the 4 metagenome assemblies according to sampling location and year:
 g1 = B1 (Squaxin)
 g2 = B2 (2019a) + B3 (2019b)
 g3 = B4 (2017a) + B5 (2017b)
 g4 = B6 (2018a) + B7 (2018b)
 
-
-## ADD ASSEMBLY DETAILS FROM EMILY
-anvio snakemake pipeline (see Emily_MAG_assembly_snakemake_pipeline.txt)
-
-
+## Metagenomes were assembled into contigs using a snakemake pipeline in anvio, with the following settings for IDBA:
  "idba_ud": {
         "--min_contig": 1000,
         "threads": 35,
         "run": true,
-     
+        "--mink": "",
+        "--maxk": "",
+        "--step": "",
+        "--inner_mink": "",
+        "--inner_step": "",
+        "--prefix": "",
+        "--min_count": "",
+        "--min_support": "",
+        "--seed_kmer": "",
+        "--similar": "",
+        "--max_mismatch": "",
+        "--min_pairs": "",
+        "--no_bubble": "",
+        "--no_local": "",
+        "--no_coverage": "",
+        "--no_correct": "",
+        "--pre_correction": "",
+        "use_scaffolds": ""}
 
-
-## Display the stats for the assembled contigs:
-cd 03_CONTIGS
+## After assembly, display the stats for the assembled contigs:
 
 anvi-display-contigs-stats g1-contigs.db
-
-contigs.fasta are the assembled contigs files
+anvi-display-contigs-stats g2-contigs.db
+anvi-display-contigs-stats g3-contigs.db
+anvi-display-contigs-stats g4-contigs.db
 
 ##############################################################
 
