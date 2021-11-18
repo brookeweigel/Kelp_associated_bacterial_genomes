@@ -110,6 +110,7 @@ anvi-estimate-metabolism -c contigs.db -p profile.db -C Final_MAGs -O Estimated_
 
 Step 4: 
 
+Combine into CONTIGS.db
 
 
 We visualized the presence-absence of functional genes across MAGs with heatmaps generated using “anvi-interactive,”
