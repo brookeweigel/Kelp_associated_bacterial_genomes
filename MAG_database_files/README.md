@@ -1,5 +1,5 @@
 # **The final MAG database files generated in anvio (contigs.db, profile.db) are available on the FigShare repository here:**
-https://figshare.com/s/84c036dc253a5dd1b1b9
+# https://figshare.com/s/84c036dc253a5dd1b1b9
 ### Note: the files are too large to upload to GitHub
 
 
