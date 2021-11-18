@@ -1,10 +1,12 @@
 # Kelp_associated_bacterial_genomes
 This repository contains code detailing the assembly and analyses of bacterial genomes from bull kelp (Nereocystis luetkeana) blades. 
-This code is associated with the publication "Functional insights into the kelp microbiome from metagenome assembled genomes"
+This code is associated with the publication "Functional insights into the kelp microbiome from metagenome assembled genomes" by Weigel el al. (submitted)
 
 All analyses, from sequence quality control to binning, were conducted in anvi’o v.7 (Eren et al. 2015, 2021).
 
 References:
+
+Weigel, B.L., Miranda, K.K., Fogarty, E.C., Watson, A.R., Pfister, C.A. Submitted. Functional insights into the kelp microbiome from metagenome assembled genomes.
 
 Eren, A. M., Ö. C. Esen, C. Quince, J. H. Vineis, H. G. Morrison, M. L. Sogin, and T. O. Delmont. 2015. Anvi’o: an advanced analysis and visualization platform for ‘omics data. PeerJ 3:e1319.
 
