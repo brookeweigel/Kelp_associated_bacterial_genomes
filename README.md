@@ -5,7 +5,7 @@ This repository contains code detailing the assembly and analyses of bacterial g
 
 All analyses, from sequence quality control to binning, were conducted in anvi’o v.7 (Eren et al. 2015, 2021).
 
-References:
+*References:*
 
 Weigel, B.L., Miranda, K.K., Fogarty, E.C., Watson, A.R., Pfister, C.A. Submitted. Functional insights into the kelp microbiome from metagenome assembled genomes.
 
