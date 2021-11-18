@@ -69,10 +69,10 @@ g4 = B6 (2018a) + B7 (2018b)
         
 ## The command “anvi-gen-contigs-database” was used to generate contigs databases, which computes k-mer frequencies and identifies open reading frames with Prodigal (Hyatt et al. 2010). 
 
-anvi-gen-contigs-database -f assembled_metagenome_g1.fa -o g1-CONTIGS.db
-anvi-gen-contigs-database -f assembled_metagenome_g2.fa -o g2-CONTIGS.db
-anvi-gen-contigs-database -f assembled_metagenome_g3.fa -o g3-CONTIGS.db
-anvi-gen-contigs-database -f assembled_metagenome_g4.fa -o g4-CONTIGS.db
+anvi-gen-contigs-database -f assembled_metagenome_g1.fa -o g1-contigs.db
+anvi-gen-contigs-database -f assembled_metagenome_g2.fa -o g2-contigs.db
+anvi-gen-contigs-database -f assembled_metagenome_g3.fa -o g3-contigs.db
+anvi-gen-contigs-database -f assembled_metagenome_g4.fa -o g4-contigs.db
 
 ## After assembly, display the stats for the assembled contigs:
 
