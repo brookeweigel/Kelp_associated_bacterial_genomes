@@ -2,4 +2,4 @@
 ### Note: the files are too large to upload to GitHub
 
 
-## The file gtdbtk.bac120.user_msa.fasta.treefile contains a phylogeny of all non-redundant MAGs in this study
+### The file "gtdbtk.bac120.user_msa.fasta.treefile" contains a phylogeny of all non-redundant MAGs in this study
