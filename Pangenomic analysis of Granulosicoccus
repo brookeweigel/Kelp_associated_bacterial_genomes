@@ -1,3 +1,4 @@
+
 # In this study, we generated a pangenome with 8 novel MAGs of Granulosicoccus sp. that we assembled, including 6 of high quality (>90% completion),
 # along with two publicly available Granulosicoccus genomes. This code details the pangenome assembly, including importing the external genomes into anvio:
 
