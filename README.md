@@ -1,5 +1,5 @@
 # **Kelp associated bacterial genomes**
-This repository contains code detailing the assembly and analyses of metagenome assembled bacterial genomes (MAGs) from bull kelp (Nereocystis luetkeana) blades. 
+This repository contains code detailing the assembly and analysis of metagenome assembled bacterial genomes (MAGs) from bull kelp (Nereocystis luetkeana) blades. 
 
 **This code is associated with the publication "Functional insights into the kelp microbiome from metagenome assembled genomes"**
 
