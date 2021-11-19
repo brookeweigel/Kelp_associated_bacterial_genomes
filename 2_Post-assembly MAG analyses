@@ -67,10 +67,6 @@ https://ecogenomics.github.io/GTDBTk/commands/classify_wf.html
 # Set the path to the reference genome database
 export GTDBTK_DATA_PATH=/project2/cpfister/genome_taxonomy_database/release95/
 
-## Submit the GTDB-Tk classify code
-# Set the path to the reference genome database
-export GTDBTK_DATA_PATH=/project2/cpfister/genome_taxonomy_database/release95/
-
 ## Submit the classify code (I used an sbatch script on a remote server)
 gtdbtk classify_wf --batchfile /project2/cpfister/nereoblade/emily_assemblies/Nereo_MAG_paths_2.txt
 --out_dir /project2/cpfister/nereoblade/emily_assemblies/13_GTDB_classify/classify_wf_output -x fa --force --debug
@@ -79,7 +75,12 @@ gtdbtk classify_wf --batchfile /project2/cpfister/nereoblade/emily_assemblies/Ne
 
 ##############################################################
 
-Step 3: Annotate contigs databases and estimate functional gene content and metabolic pathways contained in each MAG
+
+
+
+##############################################################
+
+Step X: Annotate contigs databases and estimate functional gene content and metabolic pathways contained in each MAG
 
 ## Downloads and organizes a local copy of the KOfam / KEGG database for use in function annotation
 anvi-setup-kegg-kofams
@@ -108,17 +109,86 @@ anvi-estimate-metabolism -c contigs.db -p profile.db -C Final_MAGs -O Estimated_
 
 ##############################################################
 
-Step 4: 
 
-Combine into CONTIGS.db
+## Use IQTREE (outside of anvio, on my personal computer) to make a tree of the final dereplicated MAGS:
+## environment location: /Users/brookeweigel/miniconda3/envs/iqtree
+
+## To activate this environment, use: conda activate iqtree
+## To deactivate an active environment, use: conda deactivate
+
+## Run IQtree on concatenated alignment:
+iqtree -s gtdbtk.bac120.user_msa.fasta -nt AUTO -alrt 1000 -bb 1000 -m MFP
+
+## Note: Best-fit model = LG+F+R6 chosen according to BIC
+
+## Send output .tree file from my computer to RCC:
+scp /Users/brookeweigel/Documents/1_UChicagoPhD/2_Research/01_2020_METAGENOMES/METAGENOMES_Anvio_MAGs/MAG_Phylogeny/gtdbtk.bac120.user_msa.fasta.treefile brookeweigel@midway2.rcc.uchicago.edu:/project2/cpfister/nereoblade/emily_assemblies/16_FINAL_PROFILE
+
+## Try to add GTDB-tree to the anvio profile figure:
+
+## Check IP address
+/sbin/ip route get 8.8.8.8 | awk '{print $NF;exit}'
+
+## Load anvio
+module load python
+source activate anvio-7
+
+## Try to add tree imported from IQ_tree result:
+anvi-interactive -p 16_FINAL_PROFILE/PROFILE.db -c 15_FINAL_MAPPING/MAGs-CONTIGS.db -C Final_MAGs --tree 16_FINAL_PROFILE/gtdbtk.bac120.user_msa.fasta.treefile -I 128.135.112.69 -P 8333
+
+Additional Tree ..............................: 'gtdbtk.bac120.user_msa.fasta:unknown:unknown' has been added to available trees.               
+Additional Tree ..............................: Splits will be organized based on 'gtdbtk.bac120.user_msa.fasta:unknown:unknown'.
+
+http://128.135.112.69:8333/
+
+## Select the ‘gtdbtk.bac120.user_msa.fasta’ from the ‘items order’ box in the ‘Main Settings’ tab.
+
+## NOTE: To re-root the tree, command + right click on any branch!
+
+
+##############################################################
+
+
+
+Last step: Making the final figures:
 
 
 We visualized the presence-absence of functional genes across MAGs with heatmaps generated using “anvi-interactive,”
 where the phylogeny of MAGs and python-generated functional gene tables were imported as additional layers.
 
 
+## FINAL figure with detection of MAGs across samples:
+anvi-interactive -p 16_FINAL_PROFILE/PROFILE.db -c 15_FINAL_MAPPING/MAGs-CONTIGS.db -C Final_MAGs_2 --tree 16_FINAL_PROFILE/gtdbtk.bac120.user_msa.fasta.treefile -A 16_FINAL_PROFILE/misc-data-items.txt -I 128.135.112.69 -P 8333
+
+## Saved state as “MAG_detection_across_samples_0.70”
+## For detection, set min to 0.70 and max to 1.0 to be more conservative…
+
+## To get quantitative abundance and detection values of MAGs across samples: 
+anvi-summarize on the final MAG collection, in the folder "bins_across_samples"
+## Look for files "abundance.txt" and "mean_coverage.txt"
+
+## FINAL DOM TRANSPORTER GENE FIGURE:
+anvi-interactive -p 16_FINAL_PROFILE/PROFILE.db -c 15_FINAL_MAPPING/MAGs-CONTIGS.db -C Final_MAGs --tree 16_FINAL_PROFILE/gtdbtk.bac120.user_msa.fasta.treefile -A 16_FINAL_PROFILE/misc_table_carbon.txt -I 128.135.112.68 -P 8333
+
+http://128.135.112.68:8333/
+
+## Load state = DOM_uptake_genes
 
 
+## Making nitrogen metabolism figure: misc_table_nitrogen.txt
+
+## FINAL NITROGEN METABOLISM GENE FIGURE:
+anvi-interactive -p 16_FINAL_PROFILE/PROFILE.db -c 15_FINAL_MAPPING/MAGs-CONTIGS.db -C Final_MAGs --tree 16_FINAL_PROFILE/gtdbtk.bac120.user_msa.fasta.treefile -A 16_FINAL_PROFILE/misc_table_nitrogen.txt -I 128.135.112.69 -P 8333
+
+http://128.135.112.69:8333/
+
+## Load state = nitrogen_metabolism_genes
+
+## Still need to re-root tree at Proteobacteria
+## Still need to change color back to black & white… boo :(
+
+## Highlight all N metabolism taxa, click “shade begins from branch” to highlight on phylogeny 
 
 
+##############################################################
 
