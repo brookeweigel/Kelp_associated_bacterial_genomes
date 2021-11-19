@@ -1,0 +1,67 @@
+MAG_names	Assimilatory_nitrate_reduction_K00372_nasA	Assimilatory_nitrite_reduction_K00366_nirA	Nitrate_reduction_K00374_narI	Nitrite_reduction_K00362_nirB	Nitrite_reduction_K00363_nirD	Nitrite_reduction_K00368_nirK	Urease_K01428_ureC	Urease_K01429_ureB	Urease_K01430_ureA	Urease_K14048_ureAB	phylum	class	order	family	genus
+g1_MAG_00001	N	N	N	N	N	N	N	N	N	N	Verrucomicrobiota	Verrucomicrobiae	Verrucomicrobiales	Akkermansiaceae	UBA985
+g1_MAG_00002	N	N	Y	N	N	N	Y	Y	Y	N	Proteobacteria	Gammaproteobacteria	Granulosicoccales	Granulosicoccaceae	Granulosicoccus
+g1_MAG_00003	Y	N	N	Y	Y	N	N	N	N	N	Proteobacteria	Gammaproteobacteria	Enterobacterales	Alteromonadaceae	GCA-2401725
+g1_MAG_00004	N	N	N	N	N	N	N	N	N	N	Proteobacteria	Alphaproteobacteria	Micavibrionales	Micavibrionaceae	GCA-2708415
+g1_MAG_00005	N	N	N	N	N	N	N	N	N	N	Proteobacteria	Alphaproteobacteria	Rickettsiales	Rickettsiaceae	GCA-2402195
+g1_MAG_00006	N	N	N	Y	Y	N	N	N	N	N	Verrucomicrobiota	Verrucomicrobiae	Verrucomicrobiales	Akkermansiaceae	
+g1_MAG_00007	N	Y	N	N	N	N	N	N	N	N	Verrucomicrobiota	Verrucomicrobiae	Verrucomicrobiales	Akkermansiaceae	
+g1_MAG_00008	N	N	N	N	N	N	N	N	N	N	Proteobacteria	Alphaproteobacteria	Micavibrionales	Micavibrionaceae	GCA-2708415
+g1_MAG_00009	N	N	N	N	N	N	N	N	N	N	Bacteroidota	Bacteroidia	Flavobacteriales	Flavobacteriaceae	Dokdonia
+g1_MAG_00010	N	N	N	N	N	N	N	N	N	N	Bacteroidota	Bacteroidia	Chitinophagales	Saprospiraceae	
+g1_MAG_00011	Y	N	N	Y	Y	N	Y	N	Y	N	Proteobacteria	Alphaproteobacteria	Rhodobacterales	Rhodobacteraceae	Ascidiaceihabitans
+g1_MAG_00012	N	N	N	N	N	N	N	N	N	N	Patescibacteria	Gracilibacteria	BD1-5	UBA6164	
+g1_MAG_00013	N	N	N	N	N	N	N	N	N	N	Proteobacteria	Alphaproteobacteria	Rhodobacterales	Rhodobacteraceae	Ascidiaceihabitans
+g2_MAG_00001	N	N	N	N	N	N	N	N	N	N	Bdellovibrionota	Oligoflexia	Oligoflexales		
+g2_MAG_00002	N	N	N	N	N	N	N	N	N	N	Proteobacteria	Alphaproteobacteria	Caulobacterales	Maricaulaceae	Robiginitomaculum
+g2_MAG_00003	N	N	N	N	N	N	N	N	N	N	Bdellovibrionota	Oligoflexia	Oligoflexales		
+g2_MAG_00004	N	N	N	N	N	N	N	N	N	N	Bdellovibrionota	Bdellovibrionia	Bdellovibrionales	UBA1609	
+g2_MAG_00005	N	N	N	N	N	N	N	N	N	N	Bdellovibrionota	Bdellovibrionia	Bdellovibrionales	UBA1609	
+g2_MAG_00006	N	N	N	N	N	N	N	N	N	N	Bacteroidota	Bacteroidia	Flavobacteriales	Flavobacteriaceae	Olleya
+g2_MAG_00007	N	N	N	N	N	N	N	N	N	N	Bacteroidota	Bacteroidia	Chitinophagales	Saprospiraceae	
+g2_MAG_00008	N	N	N	N	N	N	N	N	N	N	Proteobacteria	Alphaproteobacteria	Rickettsiales		
+g2_MAG_00009	N	N	N	N	N	N	Y	Y	Y	N	Proteobacteria	Gammaproteobacteria	Granulosicoccales	Granulosicoccaceae	Granulosicoccus
+g2_MAG_00011	Y	N	N	Y	Y	N	Y	Y	Y	N	Proteobacteria	Gammaproteobacteria	Granulosicoccales	Granulosicoccaceae	GCA-1730015
+g2_MAG_00013	N	N	N	N	N	N	N	N	N	N	Bacteroidota	Bacteroidia	Flavobacteriales	Flavobacteriaceae	Nonlabens
+g2_MAG_00014	N	N	N	N	N	N	N	N	N	N	Bdellovibrionota	Oligoflexia	Oligoflexales		
+g2_MAG_00015	N	N	N	Y	Y	N	N	N	N	N	Verrucomicrobiota	Verrucomicrobiae	Verrucomicrobiales	Akkermansiaceae	
+g2_MAG_00016	N	N	N	N	N	N	N	N	N	N	Bacteroidota	Bacteroidia	Chitinophagales	Saprospiraceae	
+g2_MAG_00017	N	N	N	N	N	N	N	N	N	N	Bacteroidota	Bacteroidia	Flavobacteriales	Flavobacteriaceae	HC6-5
+g2_MAG_00019	N	Y	N	Y	Y	N	N	N	N	N	Verrucomicrobiota	Verrucomicrobiae	Verrucomicrobiales	Akkermansiaceae	
+g2_MAG_00020	N	N	N	N	N	N	N	N	N	N	Bdellovibrionota				
+g2_MAG_00022	N	N	N	N	N	N	N	N	N	N	Bacteroidota	Bacteroidia	Chitinophagales	Saprospiraceae	
+g2_MAG_00024	N	N	N	N	N	N	N	N	N	N	Proteobacteria	Alphaproteobacteria	Micavibrionales	Micavibrionaceae	
+g2_MAG_00025	N	N	N	N	N	N	N	N	N	N	Bacteroidota	Bacteroidia	Chitinophagales	Saprospiraceae	UBA7328
+g2_MAG_00027	N	N	N	N	N	N	N	N	N	N	Proteobacteria	Alphaproteobacteria	Rickettsiales	21-14-0-20-44-7	
+g2_MAG_00028	N	N	N	N	N	N	N	N	N	N	Bacteroidota	Bacteroidia	Chitinophagales	Saprospiraceae	
+g2_MAG_00029	N	N	N	N	N	N	N	N	N	N	Bacteroidota	Bacteroidia	Chitinophagales	Saprospiraceae	
+g2_MAG_00030	N	N	N	N	N	N	N	N	N	N	Proteobacteria	Alphaproteobacteria	Rickettsiales	SXRF01	
+g2_MAG_00031	N	N	N	N	N	N	N	N	N	N	Bacteroidota	Bacteroidia	Chitinophagales	Saprospiraceae	
+g2_MAG_00032	N	N	N	N	N	N	N	N	N	N	Bacteroidota	Bacteroidia	Chitinophagales	Saprospiraceae	
+g2_MAG_00033	N	N	N	N	N	N	N	N	N	N	Bdellovibrionota	Bacteriovoracia	Bacteriovoracales	Bacteriovoracaceae	GCA-2713145
+g2_MAG_00034	N	N	N	Y	N	N	N	N	N	N	Verrucomicrobiota	Verrucomicrobiae	Verrucomicrobiales	Akkermansiaceae	
+g2_MAG_00036	N	N	N	N	N	N	N	N	N	N	Patescibacteria	Gracilibacteria	BD1-5		
+g2_MAG_00037	N	Y	N	N	N	N	Y	Y	Y	N	Verrucomicrobiota	Verrucomicrobiae	Verrucomicrobiales	Akkermansiaceae	
+g2_MAG_00038	N	N	N	N	N	N	N	N	N	N	Bdellovibrionota	Bacteriovoracia	Bacteriovoracales	Bacteriovoracaceae	
+g3_MAG_00001	N	N	N	N	N	N	N	N	N	N	Proteobacteria	Gammaproteobacteria	Pseudomonadales	HTCC2089	SYFY01
+g3_MAG_00002	Y	N	Y	Y	Y	Y	Y	Y	Y	N	Proteobacteria	Gammaproteobacteria	Granulosicoccales	Granulosicoccaceae	Granulosicoccus
+g3_MAG_00004	N	N	N	N	N	N	N	N	N	N	Bacteroidota	Bacteroidia	Flavobacteriales	Flavobacteriaceae	Dokdonia
+g3_MAG_00005	Y	N	N	Y	Y	N	N	N	N	N	Proteobacteria	Gammaproteobacteria	UBA10353	UBA7415	Arenicella
+g3_MAG_00006	N	N	N	N	N	N	N	N	N	N	Bacteroidota	Bacteroidia	Flavobacteriales	Flavobacteriaceae	Lacinutrix
+g3_MAG_00007	N	N	N	N	N	N	Y	N	N	Y	Planctomycetota	Phycisphaerae	Phycisphaerales	Phycisphaeraceae	Phycisphaera
+g3_MAG_00008	Y	N	N	Y	Y	N	N	N	N	N	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Sphingomonadaceae	Altererythrobacter
+g3_MAG_00010	N	N	N	N	N	N	N	N	N	N	Verrucomicrobiota	Verrucomicrobiae	Verrucomicrobiales	Akkermansiaceae	
+g3_MAG_00011	N	N	Y	N	Y	N	Y	N	N	N	Proteobacteria	Gammaproteobacteria	Granulosicoccales	Granulosicoccaceae	Granulosicoccus
+g3_MAG_00014	N	N	N	N	N	N	N	N	N	N	Bacteroidota	Bacteroidia	Chitinophagales	Saprospiraceae	
+g3_MAG_00016	N	N	N	Y	Y	N	Y	Y	Y	N	Proteobacteria	Alphaproteobacteria	Rhodobacterales	Rhodobacteraceae	Flavimaricola
+g3_MAG_00017	N	N	N	N	N	N	N	N	N	N	Verrucomicrobiota	Verrucomicrobiae	Verrucomicrobiales	Akkermansiaceae	
+g3_MAG_00018	N	N	N	N	N	N	N	N	N	N	Proteobacteria	Alphaproteobacteria	Caulobacterales	Maricaulaceae	Hellea
+g3_MAG_00019	Y	N	N	Y	Y	N	Y	Y	Y	N	Proteobacteria	Gammaproteobacteria	UBA10353	UBA7415	
+g3_MAG_00021	N	N	N	N	N	N	N	N	N	N	Bacteroidota	Bacteroidia	Flavobacteriales	Flavobacteriaceae	HC6-5
+g3_MAG_00022	N	N	N	N	N	N	N	N	N	N	Proteobacteria	Gammaproteobacteria	UBA10353	UBA7415	Arenicella
+g3_MAG_00023	N	N	N	N	N	N	N	N	N	N	Verrucomicrobiota	Verrucomicrobiae	Verrucomicrobiales	Akkermansiaceae	SW10
+g3_MAG_00024	N	N	N	N	N	N	N	N	N	N	Bacteroidota	Bacteroidia	Chitinophagales	Saprospiraceae	
+g3_MAG_00025	N	N	N	Y	Y	N	N	N	N	N	Proteobacteria	Alphaproteobacteria	Caulobacterales	Maricaulaceae	Litorimonas
+g4_MAG_00001	N	N	N	N	N	N	N	N	N	N	Proteobacteria	Alphaproteobacteria	Caulobacterales	Maricaulaceae	Hellea
+g4_MAG_00002	N	Y	N	N	N	N	N	N	N	N	Planctomycetota	Planctomycetes	Pirellulales	Pirellulaceae	Mariniblastus
+g4_MAG_00004	Y	N	Y	Y	Y	N	Y	Y	Y	N	Proteobacteria	Gammaproteobacteria	Granulosicoccales	Granulosicoccaceae	Granulosicoccus
