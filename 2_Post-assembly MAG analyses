@@ -26,8 +26,8 @@ so any of your read recruitment-based analyses will have reads split between the
 ## In this study, all MAGS were dereplicated at 99% average nucleotide identity (ANI) using the following command with --similarity-threshold set to 0.99
 ## Note that anvi'o uses 'PyANI' by Pritchard et al. (DOI: 10.1039/C5AY02550H) to compute ANI between genomes
 
-anvi-dereplicate-genomes -i MAGs_final_internal_genomes.txt -o 14_Dereplicated_MAGs/ANI_99 --program pyANI --similarity-threshold 0.99 --representative-method Qscore
--T 4 --log-file 14_Dereplicated_MAGs/ANI_99/anvi_derep.log
+anvi-dereplicate-genomes -i MAGs_final_internal_genomes.txt -o Dereplicated_MAGs/ANI_99 --program pyANI --similarity-threshold 0.99 --representative-method Qscore
+-T 4 --log-file Dereplicated_MAGs/ANI_99/anvi_derep.log
 
 ## At a similarity threshold of 99%:
 Number of redundant genomes ..................: 13                              
