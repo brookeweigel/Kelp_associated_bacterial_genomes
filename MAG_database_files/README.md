@@ -4,3 +4,6 @@
 
 
 ### The file "gtdbtk.bac120.user_msa.fasta.treefile" contains a phylogeny of all non-redundant MAGs in this study
+
+### The files misc-data-taxonomy.txt, misc_table_carbon.txt, misc_table_nitrogen.txt were provided as additional layers to generate the final figures in anvio
+### See code "2_Post-assembly MAG analyses" for details about how to visualize final graphs using these files.
