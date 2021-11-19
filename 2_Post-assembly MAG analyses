@@ -246,7 +246,7 @@ anvi-import-misc-data -p PROFILE.db  -t layers misc_table_carbon.txt
 anvi-import-misc-data -p PROFILE.db  -t layers misc_table_nitrogen.txt
 
 ## You can use the parameter --additional-layers (or simply -A) to provide a TAB-delimited file that contains additional layers of information for your visualization
-## Note: The
+## Note: The additional layer files are available in the GitHub folder "MAG_database_files"
 
 ## Final figure with detection of MAGs across samples, including MAG taxonomy:
 ## For detection, set min to 0.70 and max to 1.0 to be more conservative
