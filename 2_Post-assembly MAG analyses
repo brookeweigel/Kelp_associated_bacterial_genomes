@@ -35,7 +35,140 @@ Final number of dereplicated genomes .........: 66
 
 ##############################################################
 
-Step 2: Taxonomy assignment of MAGs using the Genome Taxonomy Database
+(Optional) Step 2: Merging all profile databases from different metagenome assemblies into a single profile database
+## If you have multiple metagenome assemblies like I do (4 seperately assembled metagenomes, each with their own contigs.db and profile.db),
+## and you want to make final figures showing the detection or abundance of MAGs across ALL samples, you will need to merge these profile databases.
+## The "anvi merge" program only merges profile databases from a single contigs database, but when you have multiple contigs databases, merging them requires the following:
+
+## Note: I adapted my own modified version of the TARA oceans workflow (https://merenlab.org/data/tara-oceans-mags/#combining-mags-from-the-12-metagenomic-sets-and-renaming-scaffolds) to
+1) create a single FASTA file for my non-redundant MAGs,
+2) generate an anvio contigs database,
+3) map short reads against the non-redundant MAG database with bowtie2,
+4) re-profile and merge into a single profile database.
+
+## Before you can create a single FASTA file for non-redundant MAG contigs, you need to rename each contig in each FASTA file to contain the MAG names.
+## This will enable you to later confidently track which contig is associated with which MAG in the final output, and create a new bin collection to import into the final profile database:
+
+## Right now, my final bins in: 10_BINNING_SUMMARY/g*_MAGs_final/bin_by_bin/g*_MAG_000**/g*_MAG_000**-contigs.fa
+Look like this: >g1_000000000283
+
+## Which tells me which sample they were assembled from (g1) but NOT which MAG they belong to
+## Fix that by doing this:
+
+anvi-script-reformat-fasta g1_MAG_00002.fa  -o ../../FINAL_MAGs/g1_MAG_00002-contigs-renamed.fa  --simplify-names --prefix g1_MAG_00002
+anvi-script-reformat-fasta g1_MAG_00003.fa  -o ../../FINAL_MAGs/g1_MAG_00003-contigs-renamed.fa  --simplify-names --prefix g1_MAG_00003
+… and so on, for all 67 MAGs (run in a batch script)
+
+## Now the contigs in this .fa file look like this: >g1_MAG_00001_000000000001
+## So when I go to concatenate all of the .fasta files, the contigs will retain the MAG info.
+
+## Next, generate an new anvio contigs database with all of the contigs from your final MAGs:
+
+### Use the cat command to make a copy of ALL of your contigs into one single fasta file:
+
+## Note: My final bins are named: g1_MAG_00006-contigs-renamed.fa, so I used this syntax to select all of these files (* = any character):
+cat 14_Dereplicated_MAGs/FINAL_MAGs/g*_MAG_000**-contigs-renamed.fa > 15_FINAL_MAPPING/Final_MAGS_all.fa
+
+## generate an anvi'o contigs database:
+anvi-gen-contigs-database -f 15_FINAL_MAPPING/Final_MAGS_all.fa -o 15_FINAL_MAPPING/MAGs-CONTIGS.db
+
+## Run hmms on the new contigs database:
+anvi-run-hmms -c 15_FINAL_MAPPING/MAGs-CONTIGS.db --num-threads 5 --just-do-it
+
+## Run scg taxonomy on the new contigs.db:
+anvi-setup-scg-taxonomy --num-threads 5
+anvi-run-scg-taxonomy -c 15_FINAL_MAPPING/MAGs-CONTIGS.db --num-threads 5
+
+## Next, you need to re-map your short reads for each metagenome (in this case, metagenomes #B1-B7) against the non-redundant MAG database:
+## Mapping short reads 
+## B1 STEP_1
+bowtie2 --threads 4 -x 15_FINAL_MAPPING/MAPPING_MAGs -1 01_QC/B1-QUALITY_PASSED_R1.fastq -2 01_QC/B1-QUALITY_PASSED_R2.fastq -S 15_FINAL_MAPPING/B1.sam
+## B1 STEP_2
+samtools view -F 4 -bS 15_FINAL_MAPPING/B1.sam > 15_FINAL_MAPPING/B1-RAW.bam
+## B1 STEP_3
+anvi-init-bam 15_FINAL_MAPPING/B1-RAW.bam -o 15_FINAL_MAPPING/B1.bam
+## B1 STEP_4
+rm 15_FINAL_MAPPING/B1.sam 15_FINAL_MAPPING/B1-RAW.bam
+
+… and repeat for all metagenome samples #B1-B7.
+
+## Profile each .BAM file using this sbatch script
+## Note: don't do --cluster-contigs because I will merge multiple profiles at the end
+
+anvi-profile -i 15_FINAL_MAPPING/B1.bam -c 15_FINAL_MAPPING/MAGs-CONTIGS.db --min-contig-length 2500 -o 14_Dereplicated_MAGs/profiles/B1 --sample-name B1 --num-threads 8
+anvi-profile -i 15_FINAL_MAPPING/B2.bam -c 15_FINAL_MAPPING/MAGs-CONTIGS.db --min-contig-length 2500 -o 14_Dereplicated_MAGs/profiles/B2 --sample-name B2 --num-threads 8
+.. and so on, for B1-B7.
+
+## Finally, run anvi-merge to merge all profile databases:
+anvi-merge 14_Dereplicated_MAGs/profiles/B*/PROFILE.db -c 15_FINAL_MAPPING/MAGs-CONTIGS.db -o 16_FINAL_PROFILE --enforce-hierarchical-clustering
+
+## Final step: after creating a new contigs.db and merging, there are no bin collections… need to create a new bin collection and import it,
+## based on the MAG prefix of of the contigs names. Modified TARA Oceans Workflow (https://merenlab.org/data/tara-oceans-mags/#profiling-957-non-redundant-mags):
+
+## The following code was run using an sbatch script:
+## Create an anvi'o collection file for non-redundant MAGs:
+for split_name in `sqlite3 15_FINAL_MAPPING/MAGs-CONTIGS.db 'select split from splits_basic_info'`
+do
+    # in this loop $split_name goes through names like this: ANW_MAG_00001_000000000001,
+    # ANW_MAG_00001_000000000002, ANW_MAG_00001_000000000003, ...; so we can extract
+    # the MAG name it belongs to:
+    MAG=`echo $split_name | awk 'BEGIN{FS="_"}{print $1"_"$2"_"$3}'`
+
+    # print out the collections line
+    echo -e "$split_name\t$MAG"
+done > NON-REDUNDANT-MAGs-COLLECTION.txt
+
+## Import the collection into the anvi'o merged profile database for non-redundant MAGs:
+anvi-import-collection NON-REDUNDANT-MAGs-COLLECTION.txt \
+                       -c 15_FINAL_MAPPING/MAGs-CONTIGS.db \
+                       -p 16_FINAL_PROFILE/PROFILE.db \
+                       -C Final_MAGs
+
+## summarize the non-redundant MAGs collection:
+anvi-summarize -c 15_FINAL_MAPPING/MAGs-CONTIGS.db \
+               -p 16_FINAL_PROFILE/PROFILE.db \
+               -C Final_MAGs \
+               -o 16_FINAL_PROFILE/Final_MAGs_summary
+
+## Okay, that was a lot of work, and if you don't have seperately assembled metagenomes, you don't need to go through the last step of merging your databases,
+## but that is what I had to do in order to get them all into a single contgs database that corresponds to a single profile database.
+## All of the subsequent analyses are based on these databases, which are publicly availble on FigShare here: https://figshare.com/s/84c036dc253a5dd1b1b9
+
+Final contigs database: MAGs-CONTIGS.db
+Final profile database: PROFILE.db
+
+##############################################################
+
+Step 3: Annotate contigs database and estimate functional gene content and metabolic pathways contained in each MAG
+
+## Downloads and organizes a local copy of the KOfam / KEGG database for use in function annotation
+anvi-setup-kegg-kofams
+
+## Downloads and organizes a local copy of NCBI’s COGs database for use in function annotation
+anvi-setup-ncbi-cogs --num-threads 5
+
+## Downloads and organizes a local copy of EBI’s Pfam database for use in function annotation
+anvi-setup-pfams
+
+## Run KEGG kOfam annotation for each contigs database
+anvi-run-kegg-kofams -c MAGs-CONTIGS.db --num-threads 6
+
+## Run Pfam annotation for each contigs database
+anvi-run-pfams -c MAGs-CONTIGS.db --num-threads 6
+
+## Run COG annotation for each contigs database
+anvi-run-ncbi-cogs -c MAGs-CONTIGS.db --num-threads 6
+
+## Now that your contigs databases are annotated with all 3 gene databases, look at functions using "anvi-export-functions":
+anvi-export-functions -c MAGs-CONTIGS.db -o All-functions.txt
+
+## Run anvi-estimate-metabolism 
+## Note: If you also provide a profile database and a collection name, anvi'o will estimate metabolism separately for each MAG in your collection:
+anvi-estimate-metabolism -c MAGs-CONTIGS.db -p PROFILE.db -C Final_MAGs -O Estimated_metabolisms 
+
+##############################################################
+
+Step 4: Taxonomy assignment of MAGs using the Genome Taxonomy Database
 
 ## Taxonomy was assigned to each MAG using GTDB-Tk (v1.3.0; Chaumeil et al. 2019) outside of anvio, which uses a set of 120 concatenated bacterial gene markers to place MAGs
 in a reference tree based on the Genome Taxonomy Database (release95, Parks et al. 2020), using both FastANI (Jain et al. 2018) and pplacer (Matsen et al. 2010).
@@ -75,82 +208,25 @@ gtdbtk classify_wf --batchfile /project2/cpfister/nereoblade/emily_assemblies/Ne
 
 ##############################################################
 
+Step 5: Use IQTREE (program located outside of anvio, http://www.iqtree.org/) to make a tree of the final dereplicated MAGS:
 
-
-
-##############################################################
-
-Step X: Annotate contigs databases and estimate functional gene content and metabolic pathways contained in each MAG
-
-## Downloads and organizes a local copy of the KOfam / KEGG database for use in function annotation
-anvi-setup-kegg-kofams
-
-## Downloads and organizes a local copy of NCBI’s COGs database for use in function annotation
-anvi-setup-ncbi-cogs --num-threads 5
-
-## Downloads and organizes a local copy of EBI’s Pfam database for use in function annotation
-anvi-setup-pfams
-
-## Run KEGG kOfam annotation for each contigs database
-anvi-run-kegg-kofams -c contigs.db --num-threads 6
-
-## Run Pfam annotation for each contigs database
-anvi-run-pfams -c contigs.db --num-threads 6
-
-## Run COG annotation for each contigs database
-anvi-run-ncbi-cogs -c contigs.db --num-threads 6
-
-## Now that your contigs databases are annotated with all 3 gene databases, look at functions using "anvi-export-functions":
-anvi-export-functions -c contigs.db -o All-functions.txt
-
-## Run anvi-estimate-metabolism 
-## Note: If you also provide a profile database and a collection name, anvi'o will estimate metabolism separately for each MAG in your collection:
-anvi-estimate-metabolism -c contigs.db -p profile.db -C Final_MAGs -O Estimated_metabolisms 
-
-##############################################################
-
-
-## Use IQTREE (outside of anvio, on my personal computer) to make a tree of the final dereplicated MAGS:
-## environment location: /Users/brookeweigel/miniconda3/envs/iqtree
-
-## To activate this environment, use: conda activate iqtree
-## To deactivate an active environment, use: conda deactivate
-
-## Run IQtree on concatenated alignment:
+## Run IQtree on concatenated alignment generated with the GTDB-Tk classify workflow above:
 iqtree -s gtdbtk.bac120.user_msa.fasta -nt AUTO -alrt 1000 -bb 1000 -m MFP
 
-## Note: Best-fit model = LG+F+R6 chosen according to BIC
+## Note: MFP = model finder plus, searches for the best-fit nucleotide (DNA) substitution model. In this case, it was LG+F+R6
 
-## Send output .tree file from my computer to RCC:
-scp /Users/brookeweigel/Documents/1_UChicagoPhD/2_Research/01_2020_METAGENOMES/METAGENOMES_Anvio_MAGs/MAG_Phylogeny/gtdbtk.bac120.user_msa.fasta.treefile brookeweigel@midway2.rcc.uchicago.edu:/project2/cpfister/nereoblade/emily_assemblies/16_FINAL_PROFILE
+## Add the phylogenetic tree to the profile figure using anvi-interactive:
+anvi-interactive -p 16_FINAL_PROFILE/PROFILE.db -c 15_FINAL_MAPPING/MAGs-CONTIGS.db -C Final_MAGs --tree 16_FINAL_PROFILE/gtdbtk.bac120.user_msa.fasta.treefile -I your_IP_address
 
-## Try to add GTDB-tree to the anvio profile figure:
-
-## Check IP address
-/sbin/ip route get 8.8.8.8 | awk '{print $NF;exit}'
-
-## Load anvio
-module load python
-source activate anvio-7
-
-## Try to add tree imported from IQ_tree result:
-anvi-interactive -p 16_FINAL_PROFILE/PROFILE.db -c 15_FINAL_MAPPING/MAGs-CONTIGS.db -C Final_MAGs --tree 16_FINAL_PROFILE/gtdbtk.bac120.user_msa.fasta.treefile -I 128.135.112.69 -P 8333
-
-Additional Tree ..............................: 'gtdbtk.bac120.user_msa.fasta:unknown:unknown' has been added to available trees.               
-Additional Tree ..............................: Splits will be organized based on 'gtdbtk.bac120.user_msa.fasta:unknown:unknown'.
-
-http://128.135.112.69:8333/
+Additional Tree ..............................: 'gtdbtk.bac120.user_msa.fasta' has been added to available trees.               
+Additional Tree ..............................: Splits will be organized based on 'gtdbtk.bac120.user_msa.fasta'.
 
 ## Select the ‘gtdbtk.bac120.user_msa.fasta’ from the ‘items order’ box in the ‘Main Settings’ tab.
-
-## NOTE: To re-root the tree, command + right click on any branch!
-
+## Note: To re-root the tree, command + right click on any branch!
 
 ##############################################################
 
-
-
-Last step: Making the final figures:
+Step 6: Making the final figures:
 
 
 We visualized the presence-absence of functional genes across MAGs with heatmaps generated using “anvi-interactive,”
