@@ -255,11 +255,6 @@ anvi-summarize -p 06_NEW_MERGED/g3/PROFILE.db -c 03_CONTIGS/g3-contigs.db -C Man
 
 ##############################################################
 
-## Now you have quality checked your metagenomic reads, assembled them into contigs, and binned those contigs into MAGs (metagenome-assembled-genomes).
-## The next code file details what happens next (analysis and visualization of MAGs)
-
-##############################################################
-
 Optional Step - Merging all profile databases from different metagenome assemblies into a single profile database
 ## If you have multiple metagenome assemblies like I do (4 seperately assembled metagenomes, each with their own contigs.db and profile.db),
 ## and you want to make final figures showing the detection or abundance of MAGs across ALL samples, you will need to merge these profile databases.
@@ -357,9 +352,15 @@ anvi-summarize -c 15_FINAL_MAPPING/MAGs-CONTIGS.db \
 
 ## Okay, that was a lot of work, and if you don't have seperately assembled metagenomes, you don't need to go through the last step of merging your databases,
 ## but that is what I had to do in order to get them all into a single contgs database that corresponds to a single profile database.
-## All of the subsequent analyses are based on these databases, which are publicly availble on FigShare ().
+## All of the subsequent analyses are based on these databases, which are publicly availble on FigShare here: https://figshare.com/s/84c036dc253a5dd1b1b9
 
 Final contigs database: MAGs-CONTIGS.db
 Final profile database: PROFILE.db
+
+##############################################################
+
+## Now you have quality checked your metagenomic reads, assembled them into contigs, binned those contigs into MAGs (metagenome-assembled-genomes),
+## and combined the metagenomic assemblies into a single, merged database.
+## The next code file details what happens next (analysis and visualization of MAGs)
 
 ##############################################################
