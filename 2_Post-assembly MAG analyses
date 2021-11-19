@@ -124,11 +124,14 @@ anvi-import-collection NON-REDUNDANT-MAGs-COLLECTION.txt \
                        -p 16_FINAL_PROFILE/PROFILE.db \
                        -C Final_MAGs
 
-## summarize the non-redundant MAGs collection:
+## Summarize the non-redundant MAGs collection:
 anvi-summarize -c 15_FINAL_MAPPING/MAGs-CONTIGS.db \
                -p 16_FINAL_PROFILE/PROFILE.db \
                -C Final_MAGs \
                -o 16_FINAL_PROFILE/Final_MAGs_summary
+               
+## To get quantitative abundance and detection values of MAGs across samples: 
+## After running anvi-summarize, look in the folder "bins_across_samples", look for files "abundance.txt" and "mean_coverage.txt"
 
 ## Okay, that was a lot of work, and if you don't have seperately assembled metagenomes, you don't need to go through the last step of merging your databases,
 ## but that is what I had to do in order to get them all into a single contgs database that corresponds to a single profile database.
@@ -175,7 +178,7 @@ in a reference tree based on the Genome Taxonomy Database (release95, Parks et a
 
 ## First, to generate contigs.fasta files for GTDB-Tk classification, MAGs were exported from anvio using anvi-summarize to get MAGs into FASTA format:
 ## See: http://merenlab.org/2016/06/22/anvio-tutorial-v2/#anvi-summarize
-anvi-summarize -p 06_NEW_MERGED/g1/PROFILE.db -c 03_CONTIGS/g1-contigs.db -C MAGs_final -o 10_BINNING_SUMMARY/g1_MAGs_final
+anvi-summarize -c MAGs-CONTIGS.db -p PROFILE.db -C MAGs_final -o 10_BINNING_SUMMARY/MAGs_final
 
 anvi-summarize will give you all the FASTA files for your bin. You will find them under under:
 YOUR_SUMMARY/bin_by_bin/*/*.fa
@@ -216,7 +219,7 @@ iqtree -s gtdbtk.bac120.user_msa.fasta -nt AUTO -alrt 1000 -bb 1000 -m MFP
 ## Note: MFP = model finder plus, searches for the best-fit nucleotide (DNA) substitution model. In this case, it was LG+F+R6
 
 ## Add the phylogenetic tree to the profile figure using anvi-interactive:
-anvi-interactive -p 16_FINAL_PROFILE/PROFILE.db -c 15_FINAL_MAPPING/MAGs-CONTIGS.db -C Final_MAGs --tree 16_FINAL_PROFILE/gtdbtk.bac120.user_msa.fasta.treefile -I your_IP_address
+anvi-interactive -p PROFILE.db -c MAGs-CONTIGS.db -C Final_MAGs --tree 16_FINAL_PROFILE/gtdbtk.bac120.user_msa.fasta.treefile -I your_IP_address
 
 Additional Tree ..............................: 'gtdbtk.bac120.user_msa.fasta' has been added to available trees.               
 Additional Tree ..............................: Splits will be organized based on 'gtdbtk.bac120.user_msa.fasta'.
@@ -226,45 +229,38 @@ Additional Tree ..............................: Splits will be organized based o
 
 ##############################################################
 
-Step 6: Making the final figures:
+Step 6: Making the final figures: We visualized the presence-absence of functional genes across MAGs with heatmaps generated using “anvi-interactive,”
+## where the phylogeny of MAGs and python-generated functional gene tables were imported as additional layers:
 
+## misc-data as ITEMS = contains information about each of your items in the central tree (MAGs),
+## and will appear as additional concentric circles when you run anvi-interactive. Use the flag -t items to add this information.
 
-We visualized the presence-absence of functional genes across MAGs with heatmaps generated using “anvi-interactive,”
-where the phylogeny of MAGs and python-generated functional gene tables were imported as additional layers.
+## Import additional items to display taxonomy information:
+anvi-import-misc-data -p PROFILE.db  -t items misc-data-taxonomy.txt
 
+## misc-data as LAYERS = contains information about each metagenome sample,
+## and will appear as graphs in line with your circles of data when you run anvi-interactive. Use the flag -t layers to add this information.
 
-## FINAL figure with detection of MAGs across samples:
-anvi-interactive -p 16_FINAL_PROFILE/PROFILE.db -c 15_FINAL_MAPPING/MAGs-CONTIGS.db -C Final_MAGs_2 --tree 16_FINAL_PROFILE/gtdbtk.bac120.user_msa.fasta.treefile -A 16_FINAL_PROFILE/misc-data-items.txt -I 128.135.112.69 -P 8333
+## Import additional layers to display functional gene information:
+anvi-import-misc-data -p PROFILE.db  -t layers misc_table_carbon.txt
+anvi-import-misc-data -p PROFILE.db  -t layers misc_table_nitrogen.txt
 
-## Saved state as “MAG_detection_across_samples_0.70”
-## For detection, set min to 0.70 and max to 1.0 to be more conservative…
+## You can use the parameter --additional-layers (or simply -A) to provide a TAB-delimited file that contains additional layers of information for your visualization
+## Note: The
 
-## To get quantitative abundance and detection values of MAGs across samples: 
-anvi-summarize on the final MAG collection, in the folder "bins_across_samples"
-## Look for files "abundance.txt" and "mean_coverage.txt"
+## Final figure with detection of MAGs across samples, including MAG taxonomy:
+## For detection, set min to 0.70 and max to 1.0 to be more conservative
+anvi-interactive -p PROFILE.db -c MAGs-CONTIGS.db -C Final_MAGs_2 --tree gtdbtk.bac120.user_msa.fasta.treefile -A misc-data-taxonomy.txt -I your_IP_address
 
-## FINAL DOM TRANSPORTER GENE FIGURE:
-anvi-interactive -p 16_FINAL_PROFILE/PROFILE.db -c 15_FINAL_MAPPING/MAGs-CONTIGS.db -C Final_MAGs --tree 16_FINAL_PROFILE/gtdbtk.bac120.user_msa.fasta.treefile -A 16_FINAL_PROFILE/misc_table_carbon.txt -I 128.135.112.68 -P 8333
+## Final figure with presence / absence of DOM assimilation genes across MAGs:
+anvi-interactive -p PROFILE.db -c MAGs-CONTIGS.db -C Final_MAGs_2 --tree gtdbtk.bac120.user_msa.fasta.treefile -A misc_table_carbon.txt -I your_IP_address
 
-http://128.135.112.68:8333/
+## Final figure with presence / absence of nitrogen cycling genes across MAGs:
+anvi-interactive -p PROFILE.db -c MAGs-CONTIGS.db -C Final_MAGs_2 --tree gtdbtk.bac120.user_msa.fasta.treefile  -A misc_table_nitrogen.txt -I your_IP_address
 
-## Load state = DOM_uptake_genes
-
-
-## Making nitrogen metabolism figure: misc_table_nitrogen.txt
-
-## FINAL NITROGEN METABOLISM GENE FIGURE:
-anvi-interactive -p 16_FINAL_PROFILE/PROFILE.db -c 15_FINAL_MAPPING/MAGs-CONTIGS.db -C Final_MAGs --tree 16_FINAL_PROFILE/gtdbtk.bac120.user_msa.fasta.treefile -A 16_FINAL_PROFILE/misc_table_nitrogen.txt -I 128.135.112.69 -P 8333
-
-http://128.135.112.69:8333/
-
-## Load state = nitrogen_metabolism_genes
-
-## Still need to re-root tree at Proteobacteria
-## Still need to change color back to black & white… boo :(
-
-## Highlight all N metabolism taxa, click “shade begins from branch” to highlight on phylogeny 
-
+## Note: To re-root the tree, command + right click on any branch, re-root tree at Proteobacteria
+## Need to change color of each gene presence/ absence to back to black & white
+## Highlight all MAGs with nitrogen metabolism genes: click “shade begins from branch” to highlight on phylogeny 
 
 ##############################################################
 
